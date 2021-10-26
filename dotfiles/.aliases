@@ -1,0 +1,47 @@
+# Git
+alias gb='git branch --sort=committerdate'
+alias ga='git add -A :/'
+alias gf='git fetch -p'
+alias gst='git status --short --branch'
+alias gbmd='gb --merged | rg -v "(\*|master)" | xargs git branch -d'
+alias monodiff='git diff --name-only origin/master... | grep "packages" | sed "s/packages\/\([^\/]*\).*/\1/g" | uniq'
+alias monofiles='git diff --name-only origin/master...'
+
+# Github
+alias prs="gh pr status"
+alias prc="gh pr create"
+alias prl="gh pr list"
+
+alias changes="gh pr diff | delta -s"
+
+
+
+# data
+alias album="vd ~/Dropbox/data/albums.csv"
+
+# Node / npm / Yarn
+alias npm_patch_publish='npm version patch && git push --follow-tags && npm publish'
+alias npm_minor_publish='npm version minor && git push --follow-tags && npm publish'
+
+root() {
+    cd ...
+    "$@"
+    cd - 
+}
+
+# tig
+alias t='tig'
+alias tst='tig status'
+
+# tmux
+alias tmrw='tmux rename-window'
+alias tmrs='tmux rename-session'
+alias tmn='tmux new'
+
+# zsh
+alias zc="$EDITOR ~/.zshrc.local"
+alias zr=". ~/.zshrc"
+
+# Misc
+alias k='kill -9'
+
