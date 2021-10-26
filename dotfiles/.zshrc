@@ -7,23 +7,14 @@ autoload -U compinit
 autoload -Uz vcs_info
 compinit -i
 
-## Oh My ZSH ##
-export ZSH=$HOME/.oh-my-zsh
-export NVM_LAZY_LOAD=true
-export NVM_COMPLETION=true
-ENABLE_CORRECTION="true"
-DISABLE_AUTO_TITLE="true"
-plugins=(git brew tmux yarn npm aws vi-mode history-substring-search fzf deno)
-export PATH=$HOME/bin:/usr/local/bin:$PATH
-export KEYTIMEOUT=1
-source $ZSH/oh-my-zsh.sh
-
 eval "$(fnm env --use-on-cd)"
 
 unsetopt correct_all  
 setopt correct
 
-## Prompt ##
+#
+# Prompt
+# 
 b="%{$fg[blue]%}"
 g="%{$fg[green]%}"
 r="%{$fg[red]%}"
@@ -116,14 +107,87 @@ precmd() {
     puffin_prompt;
 }
 
-# Loading Configs ##
+
+#
+# Functions
+#
+
+# Tell me how slow my shell is
+timezsh() {
+    shell=${1-$SHELL}
+    for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
+}
+
+# Find a process - http://onethingwell.org/post/14669173541/any
+function any() {
+    emulate -L zsh
+    unsetopt KSH_ARRAYS
+    if [[ -z "$1" ]] ; then
+        echo "any - grep for process(es) by keyword" >&2
+        echo "Usage: any " >&2 ; return 1
+    else
+        ps xauwww | grep -i --color=auto "[${1[1]}]${1[2,-1]}"
+    fi
+}
+
+function weather() {
+    bom hobart -p "%t°C"
+}
+
+unalias z 2> /dev/null
+z() {
+  [ $# -gt 0  ] && fasd_cd -d "$*" && return
+    cd "$(fasd_cd -d 2>&1 | fzf --height 40% --reverse --inline-info +s --tac --query "$*" | sed 's/^[0-9,.]* *//')"
+
+}
+
+root() {
+    cd ...
+    "$@"
+    cd - 
+}
+
+#
+# Aliases
+#
+
+# Git
+alias gb='git branch --sort=committerdate'
+alias ga='git add -A :/'
+alias gf='git fetch -p'
+alias gst='git status --short --branch'
+alias gbmd='gb --merged | rg -v "(\*|master)" | xargs git branch -d'
+alias monodiff='git diff --name-only origin/master... | grep "packages" | sed "s/packages\/\([^\/]*\).*/\1/g" | uniq'
+alias monofiles='git diff --name-only origin/master...'
+
+# Github
+alias prs="gh pr status"
+alias prc="gh pr create"
+alias prl="gh pr list"
+alias changes="gh pr diff | delta -s"
+
+# data
+alias album="vd ~/Dropbox/data/albums.csv"
+
+# npm
+alias npm_patch_publish='npm version patch && git push --follow-tags && npm publish'
+alias npm_minor_publish='npm version minor && git push --follow-tags && npm publish'
+
+# tig
+alias t='tig'
+alias tst='tig status'
+
+# tmux
+alias tmrw='tmux rename-window'
+alias tmrs='tmux rename-session'
+alias tmn='tmux new'
+
+# zsh
+alias zr=". ~/.zshrc"
+alias k='kill -9'
+
+
+# Machine Specifig Config
 if [ -f ~/.zshrc.local ]; then
     source ~/.zshrc.local
 fi
-
-# Load the shell dotfiles
-for file in ~/.{aliases,functions}; do
-    [ -r "$file" ] && [ -f "$file" ] && source "$file";
-done;
-unset file;
-
