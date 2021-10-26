@@ -3,36 +3,35 @@ if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
 fi
 
+
 autoload -U compinit
+autoload -U colors && colors
 autoload -Uz vcs_info
 compinit -i
 
-eval "$(fnm env --use-on-cd)"
 
 unsetopt correct_all  
 setopt correct
+setopt auto_cd
+
+
 
 #
 # Prompt
 # 
+
+# colors
 b="%{$fg[blue]%}"
 g="%{$fg[green]%}"
 r="%{$fg[red]%}"
 y="%{$fg[yellow]%}"
 
-puffin_prompt() {
+main_prompt() {
     local pathPrompt="%~  "
-    local gitPrompt="$(git_prompt_info)"
     local extraPrompt="$(puffin_prmpt_extra &>/dev/null && puffin_prompt_extra)"
     PROMPT="${b}${pathPrompt}${g}${vcs_info_msg_0_}${y}${extraPrompt}${y}%D{%R}${b}
 =>%{$reset_color%} "
 } 
-
-
-export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git"'
-export FZF_DEFAULT_OPTS='--color=16,bg+:-1,pointer:2,prompt:2,hl+:2,hl:2,fg+:2'
-export EDITOR="/usr/local/bin/vim"
-eval "$(fasd --init auto)"
 
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:*' check-for-changes true
@@ -92,7 +91,7 @@ function +vi-git-extras(){
 
 zstyle ':completion:*' verbose yes
 zstyle ':completion:*' menu select
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+#zstyle ':completion:*' list-colors 'di=34:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30:tw=42;30:ow=43;30'
 zstyle ':completion:*' verbose yes
 zstyle ':completion:*:descriptions' format "$fg[yellow]%B[%d]%b"
 zstyle ':completion:*:messages' format '%d'
@@ -104,8 +103,19 @@ zstyle ':completion:*:approximate:*' max-errors 2
 
 precmd() {
     vcs_info;
-    puffin_prompt;
+    main_prompt;
 }
+
+#
+# Environment
+# 
+
+eval "$(fasd --init auto)"
+eval "$(fnm env --use-on-cd)"
+export CLICOLOR=1
+export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git"'
+export FZF_DEFAULT_OPTS='--color=16,bg+:-1,pointer:2,prompt:2,hl+:2,hl:2,fg+:2'
+export EDITOR="/usr/local/bin/vim"
 
 
 #
@@ -154,7 +164,15 @@ root() {
 # Git
 alias gb='git branch --sort=committerdate'
 alias ga='git add -A :/'
+alias gc='git commit'
+alias gco='git checkout'
 alias gf='git fetch -p'
+alias gl='git pull'
+alias gp='git push'
+alias grb='git rebase'
+alias grbc='git rebase --continue'
+alias grba='git rebase --abort'
+alias gmt='git mergetool'
 alias gst='git status --short --branch'
 alias gbmd='gb --merged | rg -v "(\*|master)" | xargs git branch -d'
 alias monodiff='git diff --name-only origin/master... | grep "packages" | sed "s/packages\/\([^\/]*\).*/\1/g" | uniq'
@@ -185,6 +203,7 @@ alias tmn='tmux new'
 # zsh
 alias zr=". ~/.zshrc"
 alias k='kill -9'
+alias l='ls -lFh' 
 
 
 # Machine Specifig Config
