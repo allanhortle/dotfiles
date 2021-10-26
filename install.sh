@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 brew update;
-brew upgrade;
 
 brew tap laurent22/massren
 
