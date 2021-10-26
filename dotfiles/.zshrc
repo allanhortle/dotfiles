@@ -183,6 +183,7 @@ alias changes="gh pr diff | delta -s"
 
 # data
 alias album="vd ~/Dropbox/data/albums.csv"
+alias to='vim ~/Dropbox/bigdatr.md'
 
 # npm
 alias npm_patch_publish='npm version patch && git push --follow-tags && npm publish'
@@ -200,7 +201,9 @@ alias tmn='tmux new'
 # zsh
 alias zr=". ~/.zshrc"
 alias k='kill -9'
-alias l='ls -lFh' 
+alias l='ls -lFha' 
+
+
 
 
 # Machine Specifig Config
