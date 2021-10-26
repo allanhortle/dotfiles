@@ -1,0 +1,26 @@
+[core]
+	editor = /usr/local/bin/vim
+[user]
+	name = Allan Hortle
+	email = allanhortle@gmail.com
+[push]
+    default = current
+[merge]
+	conflictstyle = merge
+	tool = vimdiff
+[difftool]
+	prompt = false
+[diff]
+	tool = vimdiff
+[pager]
+	branch = false
+[pull]
+	ff = only
+	rebase = true
+[mergetool]
+	keepBackup = false
+[color]
+	ui = true
+
+[tig "bind"]
+        generic = D !git difftool --tool=vimdiff --no-prompt --trust-exit-code %(commit)^!
