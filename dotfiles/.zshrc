@@ -40,7 +40,7 @@ zstyle ':vcs_info:git*' actionformats "%a%b%m  "
 zstyle ':vcs_info:*+*:*' debug false
 zstyle ':vcs_info:git*+set-message:*' hooks git-extras
 
-git_changes() {
+function git_changes() {
     local NUM="$(echo $1 | grep $2 | wc -l | xargs echo)"
     if [[ "$NUM" -gt 0 ]]; then
         echo "$3$NUM"
@@ -71,13 +71,11 @@ function +vi-git-extras(){
     fi
 
     # Ahead/Behind/Conficts
-    #local NUM_AHEAD="$(git log --oneline @{u}.. 2> /dev/null | wc -l | xargs echo)"
     local NUM_AHEAD=$(echo $changes | head -1 | pcregrep -io1 "ahead (\d+)")
     if [ "$NUM_AHEAD" -gt 0 ]; then
         hook_com[misc]+=" ⬆ $NUM_AHEAD"
     fi
 
-    #local NUM_BEHIND="$(git log --oneline ..@{u} 2> /dev/null | wc -l | xargs echo)"
     local NUM_BEHIND=$(echo $changes | head -1 | pcregrep -io1 "behind (\d+)")
     if [ "$NUM_BEHIND" -gt 0 ]; then
         hook_com[misc]+=" ⬇ $NUM_BEHIND"
@@ -91,7 +89,6 @@ function +vi-git-extras(){
 
 zstyle ':completion:*' verbose yes
 zstyle ':completion:*' menu select
-#zstyle ':completion:*' list-colors 'di=34:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30:tw=42;30:ow=43;30'
 zstyle ':completion:*' verbose yes
 zstyle ':completion:*:descriptions' format "$fg[yellow]%B[%d]%b"
 zstyle ':completion:*:messages' format '%d'
@@ -101,7 +98,7 @@ zstyle ':completion:*' group-name ''
 zstyle ':completion:::::' completer _complete _approximate
 zstyle ':completion:*:approximate:*' max-errors 2
 
-precmd() {
+function precmd() {
     vcs_info;
     main_prompt;
 }
@@ -123,7 +120,7 @@ export EDITOR="/usr/local/bin/vim"
 #
 
 # Tell me how slow my shell is
-timezsh() {
+function timezsh() {
     shell=${1-$SHELL}
     for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
 }
@@ -145,13 +142,13 @@ function weather() {
 }
 
 unalias z 2> /dev/null
-z() {
+function z() {
   [ $# -gt 0  ] && fasd_cd -d "$*" && return
     cd "$(fasd_cd -d 2>&1 | fzf --height 40% --reverse --inline-info +s --tac --query "$*" | sed 's/^[0-9,.]* *//')"
 
 }
 
-root() {
+function root() {
     cd ...
     "$@"
     cd - 
