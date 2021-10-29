@@ -1,5 +1,7 @@
 [core]
 	editor = /usr/local/bin/vim
+[commit]
+    verbose = true
 [user]
 	name = Allan Hortle
 	email = allanhortle@gmail.com
