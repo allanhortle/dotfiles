@@ -1,0 +1,13 @@
+{
+  "coc.preferences.formatOnSaveFiletypes": [
+    "javascript",
+    "markdown",
+    "typescript",
+    "typescriptreact",
+    "json",
+    "graphql"
+  ],
+  "tsserver.log": "normal",
+  "explorer.file.showHiddenFiles": true,
+  "explorer.quitOnOpen": true
+}
