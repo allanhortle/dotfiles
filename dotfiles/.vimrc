@@ -198,8 +198,10 @@ let g:ctrlsf_populate_qflist = 1
 
 " coc
 let g:coc_global_extensions = [
-    \ 'coc-flow',
-    \ 'coc-tsserver'
+    \ 'coc-tsserver',
+    \ 'coc-json',
+    \ 'coc-prettier',
+    \ 'coc-styled-components'
 \ ]
 
 if isdirectory('./node_modules') && isdirectory('./node_modules/prettier')

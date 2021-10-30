@@ -10,6 +10,7 @@ brew install git
 brew install htop
 brew install massren
 brew install node
+brew install neovim
 brew install reattach-to-user-namespace
 brew install ripgrep
 brew install sops
