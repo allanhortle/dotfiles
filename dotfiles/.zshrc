@@ -213,6 +213,7 @@ alias tmn='tmux new'
 alias zr=". ~/.zshrc"
 alias k='kill -9'
 alias l='ls -lFha' 
+alias vim='nvim'
 
 
 

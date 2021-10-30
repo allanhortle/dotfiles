@@ -5,5 +5,5 @@
 cd dotfiles
 ./install.sh
 ./install-apps.sh
-stow dotfiles
+stow dotfiles --no-folding
 ```
