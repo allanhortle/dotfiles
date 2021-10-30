@@ -315,8 +315,9 @@ hi ErrorColor ctermbg=red ctermfg=black
 hi VisualColor ctermbg=magenta ctermfg=black
 hi InactiveColor ctermbg=grey ctermfg=black
 
-function! CurrentMode() abort
-    let l:currentmode = {
+function! StatusLine() abort
+    " Map the modes to nice names
+    let l:modes = {
         \ 'n'      : 'normal',
         \ 'no'     : 'normal op',
         \ 'v'      : 'visual',
@@ -336,14 +337,9 @@ function! CurrentMode() abort
         \ '!'      : 'shell',
         \ 't'      : 'terminal'
     \}
-    let l:modecurrent = mode()
-    let l:modelist = get(l:currentmode, l:modecurrent, 'vblock')
-    let l:current_status_mode = l:modelist
-    return l:current_status_mode
-endfunction
-
-function! StatusLineColor() 
-    let l:mode = CurrentMode()
+    " get the current mode - vblock is not returned from mode()
+    let l:currentmode = get(l:modes, mode(), 'vblock')
+    
     let l:modecolors={
         \ 'normal': 'NormalColor',
         \ 'insert': 'InsertColor',
@@ -351,44 +347,48 @@ function! StatusLineColor()
         \ 'vblock': 'VisualColor',
         \ 'vline': 'VisualColor',
         \ 'command': 'OtherColor',
-        \}
+    \}
 
     let info = get(b:, 'coc_diagnostic_info', {})
-    if get(info, 'error', 0) && l:mode == 'normal'
-        return "%#ErrorColor#" 
+    let error = get(info, 'error', 0)
+    let l:errortext = ""
+    if error
+        let l:errortext = "(E". info['error'] . ")"
     endif
 
-    if g:actual_curwin != win_getid() 
-        return "%#InactiveColor#" 
+    " Choose color
+    if error && l:currentmode == 'normal'
+        let l:color = "%#ErrorColor#" 
+    elseif g:actual_curwin != win_getid() 
+        let l:color = "%#InactiveColor#" 
+    else 
+        let l:color = "%#" . get(l:modecolors, l:currentmode, 'StatusLine') . "#"
     endif
-    return "%#" . get(l:modecolors, l:mode, 'StatusLine') . "#"
+
+    let statusline="".l:color." ".l:currentmode." "
+    let statusline.=" %(%-0.75f %M%)"
+    let statusline.="%="
+    let statusline.="".l:errortext
+    let statusline.="%r%w%y" "read only, preview, filetype
+    let statusline.=" %v:%l/%L "
+    return statusline
+
 endfunction
 
-function! StatusDiagnostic() abort
-    let info = get(b:, 'coc_diagnostic_info', {})
-    if empty(info) | return '' | endif
-    let msgs = []
-    if get(info, 'error', 0)
-        call add(msgs, '!' . info['error'])
-    endif
-    if get(info, 'warning', 0)
-        call add(msgs, '?' . info['warning'])
-    endif
-    return join(msgs, ' ')
-endfunction
+"function! StatusDiagnostic() abort
+    "let info = get(b:, 'coc_diagnostic_info', {})
+    "if empty(info) | return '' | endif
+    "let msgs = []
+    "if get(info, 'error', 0)
+        "call add(msgs, 'E:' . info['error'])
+    "endif
+    "if get(info, 'warning', 0)
+        "call add(msgs, 'W:' . info['warning'])
+    "endif
+    "return join(msgs, ' ')
+"endfunction
 
-function! StatusLineContent()
-  let statusline=""
-  let statusline.=" %{CurrentMode()} "
-  let statusline.=" %(%-0.75f %M%)"
-  let statusline.=" %{StatusDiagnostic()}"
-  let statusline.="%="
-  let statusline.="%( %r%w%y%)"
-  let statusline.=" %v:%l/%L "
-  return statusline
-endfunction
 
 set statusline=
-set statusline+=%{%StatusLineColor()%}
-set statusline+=%{%StatusLineContent()%}
+set statusline+=%{%StatusLine()%}
 
