@@ -316,7 +316,6 @@ hi VisualColor ctermbg=magenta ctermfg=black
 hi InactiveColor ctermbg=grey ctermfg=black
 
 function! StatusLine() abort
-    " Map the modes to nice names
     let l:modes = {
         \ 'n'      : 'normal',
         \ 'no'     : 'normal op',
@@ -337,10 +336,8 @@ function! StatusLine() abort
         \ '!'      : 'shell',
         \ 't'      : 'terminal'
     \}
-    " get the current mode - vblock is not returned from mode()
-    let l:currentmode = get(l:modes, mode(), 'vblock')
-    
-    let l:modecolors={
+
+    let l:modecolors = {
         \ 'normal': 'NormalColor',
         \ 'insert': 'InsertColor',
         \ 'visual': 'VisualColor',
@@ -349,45 +346,40 @@ function! StatusLine() abort
         \ 'command': 'OtherColor',
     \}
 
-    let info = get(b:, 'coc_diagnostic_info', {})
-    let error = get(info, 'error', 0)
+    " get the current mode - ctrl-v is hard to map
+    let l:currentmode = get(l:modes, mode(), 'vblock')
+
+    " diagnostics
+    let l:info = get(b:, 'coc_diagnostic_info', {})
+    let l:error = get(info, 'error', 0)
+    let l:msgs = []
+    if l:error | call add(l:msgs, "E". l:info['error']) | endif
+    if get(l:info, 'warning', 0) | call add(l:msgs, "W". l:info['warning']) | endif
+    if get(l:info, 'information', 0) | call add(l:msgs, "I". l:info['information']) | endif
+    if get(l:info, 'hint', 0) | call add(l:msgs, "H". l:info['hint']) | endif
     let l:errortext = ""
-    if error
-        let l:errortext = "(E". info['error'] . ")"
-    endif
+    if len(msgs) | let l:errortext = "  " . join(l:msgs, ",") | endif
 
     " Choose color
-    if error && l:currentmode == 'normal'
+    if l:error && l:currentmode ==? 'normal'
         let l:color = "%#ErrorColor#" 
-    elseif g:actual_curwin != win_getid() 
+    elseif g:actual_curwin !=? win_getid() 
         let l:color = "%#InactiveColor#" 
     else 
         let l:color = "%#" . get(l:modecolors, l:currentmode, 'StatusLine') . "#"
     endif
 
-    let statusline="".l:color." ".l:currentmode." "
-    let statusline.=" %(%-0.75f %M%)"
+    " Construct content
+    let statusline="".l:color." ".l:currentmode
+    let statusline.="  %(%-0.75f%{&modified?\"*\":\"\"}%)"
+
+    let statusline.= l:errortext
     let statusline.="%="
-    let statusline.="".l:errortext
     let statusline.="%r%w%y" "read only, preview, filetype
     let statusline.=" %v:%l/%L "
     return statusline
 
 endfunction
-
-"function! StatusDiagnostic() abort
-    "let info = get(b:, 'coc_diagnostic_info', {})
-    "if empty(info) | return '' | endif
-    "let msgs = []
-    "if get(info, 'error', 0)
-        "call add(msgs, 'E:' . info['error'])
-    "endif
-    "if get(info, 'warning', 0)
-        "call add(msgs, 'W:' . info['warning'])
-    "endif
-    "return join(msgs, ' ')
-"endfunction
-
 
 set statusline=
 set statusline+=%{%StatusLine()%}
