@@ -32,15 +32,20 @@ Plug 'tpope/vim-markdown'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 
+" Neovim
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/playground'
+
 " Syntax
 Plug 'cakebaker/scss-syntax.vim'
 Plug 'calviken/vim-gdscript3'
 Plug 'editorconfig/editorconfig-vim'
-Plug 'jason0x43/vim-js-indent'
 Plug 'jparise/vim-graphql'
-Plug 'maxmellon/vim-jsx-pretty'
-Plug 'pangloss/vim-javascript'
-Plug 'peitalin/vim-jsx-typescript'
+"Plug 'jason0x43/vim-js-indent'
+"Plug 'maxmellon/vim-jsx-pretty'
+"Plug 'pangloss/vim-javascript'
+"Plug 'peitalin/vim-jsx-typescript'
+
 call plug#end() 
 
 
@@ -124,10 +129,6 @@ filetype plugin on
 let g:markdown_fold_style = 'nested'
 let g:markdown_fenced_languages = ['javascript', 'typescript']
 
-" emmet
-"let g:user_emmet_expandabbr_key='<Tab>'
-"imap <expr> <tab> emmet#expandAbbrIntelligent("\<tab>")
-
 " Goyo
 function! s:goyo_enter()
     set linebreak!
@@ -167,6 +168,7 @@ let g:coc_global_extensions = [
     \ 'coc-tsserver',
     \ 'coc-json',
     \ 'coc-explorer',
+    \ 'coc-lua',
     \ 'coc-vimlsp',
     \ 'coc-styled-components'
 \ ]
@@ -225,16 +227,18 @@ nnoremap <Space> .
 nnoremap <MiddleMouse> :call CocAction('doHover')<CR>
 nnoremap <C-p> :Files<CR>
 nnoremap <expr> <C-p> (expand('%') =~ 'NERD_tree' ? ":NERDTreeToggle\<CR>" : '').":Files\<cr>"
-nmap <C-f> <Plug>CtrlSFPrompt
+nnoremap <C-f> <Plug>CtrlSFPrompt
 nnoremap <CR> :noh<CR><CR>
 nnoremap <Leader>h :Startify<CR>
 nnoremap <Leader>b :bp<CR>
 nnoremap <Leader>e :CocList --normal -A diagnostics<CR>
 nnoremap <Leader>a :CocAction<CR>
 nnoremap <Leader>f :bn<CR>
+nnoremap <Leader>t :TSHighlightCapturesUnderCursor<CR>
 nnoremap <Leader>q :bp \|bw #<CR>
 nnoremap <Leader>s :Startify<CR>
 nnoremap <Leader>r :source $MYVIMRC<CR>
+nnoremap <Leader>v :e $MYVIMRC<CR>
 nnoremap <Leader>u :UndotreeToggle<CR>
 nnoremap <Leader>d1 :diffget LOCAL<CR>
 nnoremap <Leader>d2 :diffget BASE<CR>
@@ -274,12 +278,12 @@ command! -bang WQa wqa<bang>
 command! -bang WQA wqa<bang>
 
 " nops
-noremap <Up> <nop>
-noremap <Down> <nop>
-noremap <Left> <nop>
-noremap <Right> <nop>
-noremap <BS> <nop>
-noremap <TAB> <nop>
+nnoremap <Up> <nop>
+nnoremap <Down> <nop>
+nnoremap <Left> <nop>
+nnoremap <Right> <nop>
+nnoremap <BS> <nop>
+nnoremap <TAB> <nop>
 nnoremap q: <nop>
 
 
@@ -298,7 +302,7 @@ syntax on
 if &diff
     syntax off
 endif
-colorscheme puffin
+colorscheme ts-colors
 
 
 "
@@ -381,6 +385,5 @@ function! StatusLine() abort
 
 endfunction
 
-set statusline=
-set statusline+=%{%StatusLine()%}
+set statusline=%{%StatusLine()%}
 
