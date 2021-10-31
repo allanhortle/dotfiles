@@ -1,5 +1,5 @@
 require('nvim-treesitter.configs').setup {
-    ensure_installed = {"tsx", "typescript", "lua", "vim", "css", "graphql"},
+    ensure_installed = {"tsx", "typescript", "lua", "vim", "css", "graphql", "json", "yaml"},
     highlight = {
         enable = true,              -- false will disable the whole extension
         additional_vim_regex_highlighting = false

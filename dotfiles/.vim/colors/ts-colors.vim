@@ -22,15 +22,19 @@ hi Title ctermfg=white cterm=none
 
 " Tree Sitter
 hi TSKeyword ctermfg=red cterm=none
+hi TSKeywordOperator ctermfg=red cterm=none
+hi TSFunction ctermfg=red cterm=none
 hi TSString ctermfg=green cterm=none
 hi TSType ctermfg=magenta cterm=none
 hi TSTag ctermfg=yellow cterm=none
+
+hi TSLabel ctermfg=yellow cterm=none
+hi TSField ctermfg=yellow cterm=none
 
 " Tree Sitter Overrides
 hi cssTSProperty ctermfg=red cterm=none
 hi cssTSType ctermfg=yellow cterm=none
 hi cssTSString ctermfg=blue cterm=none
-"hi graphqlTSParameter ctermfg=yellow cterm=none
 hi graphqlTSVariable ctermfg=yellow cterm=none
 
 "
