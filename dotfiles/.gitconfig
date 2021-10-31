@@ -13,7 +13,7 @@
 [difftool]
 	prompt = false
 [diff]
-	tool = vimdiff
+	tool = vimdiff3
 [pager]
 	branch = false
 [pull]
@@ -26,3 +26,8 @@
 
 [tig "bind"]
         generic = D !git difftool --tool=vimdiff --no-prompt --trust-exit-code %(commit)^!
+
+[difftool "vimdiff3"]
+	path = nvim
+[mergetool "vimdiff"]
+	path = nvim
