@@ -1,13 +1,19 @@
 {
-  "coc.preferences.formatOnSaveFiletypes": [
-    "javascript",
-    "markdown",
-    "typescript",
-    "typescriptreact",
-    "json",
-    "graphql"
-  ],
-  "tsserver.log": "normal",
-  "explorer.file.showHiddenFiles": true,
-  "explorer.quitOnOpen": true
+    "coc.preferences.formatOnSaveFiletypes": [
+        "javascript",
+        "markdown",
+        "typescript",
+        "typescriptreact",
+        "json",
+        "graphql"
+    ],
+    "tsserver.log": "normal",
+    "explorer.file.showHiddenFiles": true,
+    "explorer.quitOnOpen": true,
+    "prettier.semi": true,
+    "prettier.tabWidth": 4,
+    "prettier.singleQuote": true,
+    "prettier.bracketSpacing": false,
+    "prettier.trailingComma": "none",
+    "prettier.printWidth": 100
 }
