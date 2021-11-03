@@ -7,7 +7,15 @@ fi
 autoload -U compinit
 autoload -U colors && colors
 autoload -Uz vcs_info
+autoload -U up-line-or-beginning-search
+autoload -U down-line-or-beginning-search
 compinit -i
+
+# History Search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey "^[[A" up-line-or-beginning-search # Up
+bindkey "^[[B" down-line-or-beginning-search # Down
 
 
 unsetopt correct_all  
@@ -30,6 +38,14 @@ setopt share_history          # share command history data
 #
 # Prompt
 # 
+function zle-line-init zle-keymap-select {
+    RPS1="${${KEYMAP/vicmd/${r}<<<}/(main|viins)/}"
+    RPS2=$RPS1
+    zle reset-prompt
+}
+
+zle -N zle-line-init
+zle -N zle-keymap-select
 
 # colors
 b="%{$fg[blue]%}"
@@ -37,10 +53,9 @@ g="%{$fg[green]%}"
 r="%{$fg[red]%}"
 y="%{$fg[yellow]%}"
 
-main_prompt() {
+function main_prompt() {
     local pathPrompt="%~  "
-    local extraPrompt="$(puffin_prmpt_extra &>/dev/null && puffin_prompt_extra)"
-    PROMPT="${b}${pathPrompt}${g}${vcs_info_msg_0_}${y}${extraPrompt}${y}%D{%R}${b}
+    PROMPT="${b}${pathPrompt}${g}${vcs_info_msg_0_}${y}%D{%R}${b}
 =>%{$reset_color%} "
 } 
 
@@ -52,49 +67,49 @@ zstyle ':vcs_info:*+*:*' debug false
 zstyle ':vcs_info:git*+set-message:*' hooks git-extras
 
 function git_changes() {
-    local NUM="$(echo $1 | grep $2 | wc -l | xargs echo)"
-    if [[ "$NUM" -gt 0 ]]; then
-        echo "$3$NUM"
+    local num="$(echo $1 | grep $2 | wc -l | xargs echo)"
+    if [[ "$num" -gt 0 ]]; then
+        echo "$3$num"
     fi
 }
 
 function +vi-git-extras(){
     local changes=$(git status --short --branch -u 2> /dev/null);
-    local STAGED=""
-    local MISC=""
-    local UNSTAGED=""
+    local staged=""
+    local misc=""
+    local unstaged=""
 
     # Staged
-    STAGED+="$(git_changes "${changes}" "^[AC]" "+")"
-    STAGED+="$(git_changes "${changes}" "^M" "~")"
-    STAGED+="$(git_changes "${changes}" "^D" "-")"
-    STAGED+="$(git_changes "${changes}" "^R" ">")"
-    if [[ -n $STAGED ]]; then
-        hook_com[misc]+=" [${STAGED}]"
+    staged+="$(git_changes "${changes}" "^[AC]" "+")"
+    staged+="$(git_changes "${changes}" "^M" "~")"
+    staged+="$(git_changes "${changes}" "^D" "-")"
+    staged+="$(git_changes "${changes}" "^R" ">")"
+    if [[ -n $staged ]]; then
+        hook_com[misc]+=" [${staged}]"
     fi
 
     # Unstaged
-    UNSTAGED+="$(git_changes "${changes}" "^.M" "~")"
-    UNSTAGED+="$(git_changes "${changes}" "^.D" "-")"
-    UNSTAGED+="$(git_changes "${changes}" "^??" "?")"
-    if [[ -n $UNSTAGED ]]; then
-        hook_com[misc]+=" $UNSTAGED";
+    unstaged+="$(git_changes "${changes}" "^.M" "~")"
+    unstaged+="$(git_changes "${changes}" "^.D" "-")"
+    unstaged+="$(git_changes "${changes}" "^??" "?")"
+    if [[ -n $unstaged ]]; then
+        hook_com[misc]+=" $unstaged";
     fi
 
     # Ahead/Behind/Conficts
-    local NUM_AHEAD=$(echo $changes | head -1 | pcregrep -io1 "ahead (\d+)")
-    if [ "$NUM_AHEAD" -gt 0 ]; then
-        hook_com[misc]+=" ⬆ $NUM_AHEAD"
+    local num_ahead=$(echo $changes | head -1 | pcregrep -io1 "ahead (\d+)")
+    if [ "$num_ahead" -gt 0 ]; then
+        hook_com[misc]+=" ⬆ $num_ahead"
     fi
 
-    local NUM_BEHIND=$(echo $changes | head -1 | pcregrep -io1 "behind (\d+)")
-    if [ "$NUM_BEHIND" -gt 0 ]; then
-        hook_com[misc]+=" ⬇ $NUM_BEHIND"
+    local num_behind=$(echo $changes | head -1 | pcregrep -io1 "behind (\d+)")
+    if [ "$num_behind" -gt 0 ]; then
+        hook_com[misc]+=" ⬇ $num_behind"
     fi
 
-    MISC+="$(git_changes "${changes}" '^UU' "${r}✕")"
-    if [[ -n $MISC ]]; then
-        hook_com[misc]+=" ${MISC}"
+    misc+="$(git_changes "${changes}" '^UU' "${r}✕")"
+    if [[ -n $misc ]]; then
+        hook_com[misc]+=" ${misc}"
     fi
 }
 
@@ -124,6 +139,7 @@ export CLICOLOR=1
 export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git"'
 export FZF_DEFAULT_OPTS='--color=16,bg+:-1,pointer:2,prompt:2,hl+:2,hl:2,fg+:2'
 export EDITOR="/usr/local/bin/vim"
+export HOMEBREW_NO_INSTALL_UPGRADE=1
 
 
 #
@@ -164,6 +180,18 @@ function root() {
     "$@"
     cd - 
 }
+
+#
+# Tmux
+#
+function tmux() {
+  if [[ -n "$@" ]]; then
+    command tmux "$@"
+    return $?
+  fi
+  tmux attach || tmux
+}
+
 
 #
 # Aliases
