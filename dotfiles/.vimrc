@@ -24,13 +24,13 @@ Plug 'mhinz/vim-startify'
 Plug 'mzlogin/vim-markdown-toc'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'scrooloose/nerdcommenter'
-Plug 'scrooloose/nerdtree'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-markdown'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
+Plug 'tweekmonster/startuptime.vim'
 
 " Neovim
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -85,7 +85,7 @@ set t_Co=256
 set t_BE=
 set tabstop=4                   " a tab is four spaces
 set timeoutlen=1000 ttimeoutlen=0
-set updatetime=250
+set updatetime=100
 set wildmenu
 set wildmode=longest:full,full
 set numberwidth=1               " make line numbers closer to ~
@@ -227,7 +227,8 @@ nnoremap <Space> .
 nnoremap <MiddleMouse> :call CocAction('doHover')<CR>
 nnoremap <C-p> :Files<CR>
 nnoremap <expr> <C-p> (expand('%') =~ 'NERD_tree' ? ":NERDTreeToggle\<CR>" : '').":Files\<cr>"
-nnoremap <C-f> <Plug>CtrlSFPrompt
+"nnoremap <C-f> <Plug>CtrlSFPrompt
+nnoremap <C-f> :CtrlSF 
 nnoremap <CR> :noh<CR><CR>
 nnoremap <Leader>h :Startify<CR>
 nnoremap <Leader>b :bp<CR>
@@ -310,7 +311,7 @@ colorscheme ts-colors
 "
 set noshowmode " dont show --insert--
 set laststatus=2 " always visible
-hi StatusLine ctermbg=black ctermfg=white cterm=none 
+hi StatusLine ctermbg=white ctermfg=black cterm=NONE
 hi StatusLineNC ctermbg=black cterm=NONE
 hi NormalColor ctermbg=blue ctermfg=black
 hi InsertColor ctermbg=green ctermfg=black
@@ -365,9 +366,9 @@ function! StatusLine() abort
     if len(msgs) | let l:errortext = "  " . join(l:msgs, ",") | endif
 
     " Choose color
-    if l:error && l:currentmode ==? 'normal'
-        let l:color = "%#ErrorColor#" 
-    elseif g:actual_curwin !=? win_getid() 
+    "if l:error && l:currentmode ==? 'normal'
+        "let l:color = "%#ErrorColor#" 
+    if g:actual_curwin !=? win_getid() 
         let l:color = "%#InactiveColor#" 
     else 
         let l:color = "%#" . get(l:modecolors, l:currentmode, 'StatusLine') . "#"
@@ -377,7 +378,7 @@ function! StatusLine() abort
     let statusline="".l:color." ".l:currentmode
     let statusline.="  %(%-0.75f%{&modified?\"*\":\"\"}%)"
 
-    let statusline.= l:errortext
+    "let statusline.= l:errortext
     let statusline.="%="
     let statusline.="%r%w%y" "read only, preview, filetype
     let statusline.=" %v:%l/%L "
