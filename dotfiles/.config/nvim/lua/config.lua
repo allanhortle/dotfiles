@@ -1,5 +1,5 @@
 require('nvim-treesitter.configs').setup {
-    ensure_installed = {"tsx", "typescript", "lua", "vim", "css", "graphql", "json", "yaml"},
+    ensure_installed = "maintained",
     highlight = {
         enable = true,              -- false will disable the whole extension
         additional_vim_regex_highlighting = false
@@ -50,6 +50,7 @@ local highlights = [[
   "yield"
 ] @keyword
 
+
 [
   (true)
   (false)
@@ -80,6 +81,7 @@ local highlights = [[
 ; Types
 [
     (type_arguments) 
+    (type_annotation) 
     (type_alias_declaration)
     (type_parameters) 
 ] @type
@@ -98,6 +100,7 @@ local jsx_highlights = [[
 (jsx_opening_element name: (_) @tag)
 (jsx_self_closing_element name: (_) @tag)
 (jsx_self_closing_element ["<" ">" "/"] @tag)
+(jsx_fragment ["<" ">" "/"] @tag)
 (jsx_closing_element) @tag
 ]];
 

@@ -185,11 +185,11 @@ function root() {
 # Tmux
 #
 function tmux() {
-  if [[ -n "$@" ]]; then
-    command tmux "$@"
-    return $?
-  fi
-  tmux attach || tmux
+    if [[ -n "$@" ]]; then
+        command tmux "$@"
+    else 
+        tmux attach || tmux new
+    fi
 }
 
 
