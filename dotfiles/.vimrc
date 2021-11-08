@@ -157,6 +157,7 @@ let g:startify_lists = [
 " ctrlsf
 let g:ctrlsf_auto_focus = { "at": "start" }
 let g:ctrlsf_populate_qflist = 1
+let g:coc_node_path = '~/.fnm/aliases/default/bin/node'
 
 
 "
