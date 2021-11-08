@@ -3,60 +3,49 @@ hi clear
 if exists("syntax_on")
   syntax reset
 endif
-let g:colors_name = "puffin"
+let g:colors_name = "ts-colors"
 
-"
-" Basic
-"
-hi Normal cterm=none ctermfg=white ctermbg=none
+" Reset
+hi Normal cterm=NONE ctermfg=white ctermbg=NONE
 hi Comment ctermfg=242 cterm=italic
-hi Constant ctermfg=white cterm=none
-hi Statement ctermfg=white cterm=none
-hi Identifier ctermfg=white cterm=none
-hi PreProc ctermfg=white cterm=none
-hi Type ctermfg=white cterm=none
-hi Special ctermfg=white cterm=none
-hi Statement ctermfg=white cterm=none
-hi Title ctermfg=white cterm=none
-hi Nothing ctermfg=white cterm=none
+hi Constant ctermfg=white cterm=NONE
+hi Statement ctermfg=white cterm=NONE
+hi Identifier ctermfg=white cterm=NONE
+hi PreProc ctermfg=white cterm=NONE
+hi Type ctermfg=white cterm=NONE
+hi Special ctermfg=white cterm=NONE
+hi Statement ctermfg=white cterm=NONE
+hi Title ctermfg=white cterm=NONE
+hi Nothing ctermfg=white cterm=NONE
 
 
 " Tree Sitter
-hi TSConditional ctermfg=red cterm=none
-hi TSConstBuiltin ctermfg=blue cterm=none
-hi TSBoolean ctermfg=blue cterm=none
-hi TSNumber ctermfg=blue cterm=none
-hi TSKeyword ctermfg=red cterm=none
-hi TSVariableBuiltin ctermfg=red cterm=none
-hi TSKeywordFunction ctermfg=red cterm=none
-hi TSKeywordOperator ctermfg=red cterm=none
-hi TSLabel ctermfg=yellow cterm=none
-hi TSString ctermfg=green cterm=none
-hi TSTag ctermfg=yellow cterm=none
-hi TSTagDelimiter ctermfg=yellow cterm=none
-hi TSTagAttribute ctermfg=yellow cterm=none
-hi TSType ctermfg=magenta cterm=none
+hi TSConditional ctermfg=red cterm=NONE
+hi TSConstBuiltin ctermfg=blue cterm=NONE
+hi TSBoolean ctermfg=blue cterm=NONE
+hi TSNumber ctermfg=blue cterm=NONE
+hi TSKeyword ctermfg=red cterm=NONE
+hi TSVariableBuiltin ctermfg=red cterm=NONE
+hi TSKeywordFunction ctermfg=red cterm=NONE
+hi TSKeywordOperator ctermfg=red cterm=NONE
+hi TSLabel ctermfg=yellow cterm=NONE
+hi TSString ctermfg=green cterm=NONE
+hi TSTag ctermfg=yellow cterm=NONE
+hi TSTagDelimiter ctermfg=yellow cterm=NONE
+hi TSTagAttribute ctermfg=yellow cterm=NONE
+hi TSType ctermfg=magenta cterm=NONE
 
 " Tree Sitter Overrides
-hi cssTSProperty ctermfg=red cterm=none
-hi cssTSType ctermfg=yellow cterm=none
-hi cssTSString ctermfg=blue cterm=none
-hi graphqlTSVariable ctermfg=yellow cterm=none
+hi tmuxCommands ctermfg=red cterm=NONE
+hi tmuxString ctermfg=green cterm=NONE
 
-" tmux
-hi tmuxCommands ctermfg=red cterm=none
-hi tmuxString ctermfg=green cterm=none
-
-
-"
 " vim UI
-"
 hi ColorColumn ctermbg=black
 hi Directory ctermfg=white
 hi Error ctermbg=red ctermfg=black
 hi ErrorMsg ctermfg=red ctermbg=black
-hi FoldColumn ctermbg=none ctermfg=1
-hi Folded ctermbg=none ctermfg=242
+hi FoldColumn ctermbg=NONE ctermfg=1
+hi Folded ctermbg=NONE ctermfg=242
 hi LineNr ctermfg=242
 hi MatchParen ctermfg=white ctermbg=grey
 hi ModeMsg ctermfg=white
@@ -66,23 +55,21 @@ hi PMenu ctermfg=white ctermbg=234
 hi PMenuSel ctermfg=black ctermbg=green
 hi Question ctermfg=white
 hi Search ctermbg=grey
-hi SignColumn ctermbg=none
+hi SignColumn ctermbg=NONE
 hi SpecialKey ctermfg=white
-hi SpellBad ctermfg=red ctermbg=none cterm=underline
-hi SpellCap ctermfg=yellow ctermbg=none cterm=underline
-hi SpellLocal ctermfg=none ctermbg=none cterm=none
-hi TabLine ctermfg=none ctermbg=none cterm=none
-hi TabLineFill ctermfg=none ctermbg=none cterm=none
-hi TabLineSel ctermfg=green ctermbg=none cterm=none
-hi VertSplit ctermfg=white cterm=none ctermbg=none
+hi SpellBad ctermfg=red ctermbg=NONE cterm=underline
+hi SpellCap ctermfg=yellow ctermbg=NONE cterm=underline
+hi SpellLocal ctermfg=NONE ctermbg=NONE cterm=NONE
+hi TabLine ctermfg=NONE ctermbg=NONE cterm=NONE
+hi TabLineFill ctermfg=NONE ctermbg=NONE cterm=NONE
+hi TabLineSel ctermfg=green ctermbg=NONE cterm=NONE
+hi VertSplit ctermfg=white cterm=NONE ctermbg=NONE
 hi Visual ctermbg=240
 hi WarningMsg ctermfg=yellow ctermbg=black
 hi StartifyHeader ctermfg=yellow 
 hi StartifySection ctermfg=242 
 
-"
-" vim
-"
+" vim script
 hi vimCommand ctermfg=red
 hi vimString ctermfg=green
 hi vimHiCtermColor ctermfg=blue
@@ -92,12 +79,7 @@ hi vimNotation ctermfg=yellow
 hi vimBracket ctermfg=yellow
 hi vimMapModKey ctermfg=yellow
 
-
-"
-" diff
-"
-
-" git
+" git diff
 hi diffAdded ctermfg=green ctermbg=NONE
 hi diffRemoved ctermfg=red ctermbg=NONE
 hi diffChanged ctermfg=blue ctermbg=NONE
@@ -109,9 +91,9 @@ hi diffLine ctermfg=magenta
 hi diffSubname ctermfg=magenta
 
 " vimdiff
-hi DiffAdd ctermfg=green ctermbg=none cterm=none
-hi DiffDelete ctermfg=red ctermbg=none cterm=none
-hi DiffChange ctermfg=white ctermbg=none cterm=none
-hi DiffText ctermfg=blue ctermbg=none cterm=none
+hi DiffAdd ctermfg=green ctermbg=NONE cterm=NONE
+hi DiffDelete ctermfg=red ctermbg=NONE cterm=NONE
+hi DiffChange ctermfg=white ctermbg=NONE cterm=NONE
+hi DiffText ctermfg=blue ctermbg=NONE cterm=NONE
 
 
