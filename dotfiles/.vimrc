@@ -8,7 +8,6 @@ if empty(glob('~/.vim/autoload/plug.vim'))
     autocmd VimEnter * PlugInstall | source $MYVIMRC
 endif
 call plug#begin('~/.vim/plugged')
-
 Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'benmills/vimux'
@@ -31,21 +30,11 @@ Plug 'tpope/vim-markdown'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tweekmonster/startuptime.vim'
+Plug 'editorconfig/editorconfig-vim'
 
 " Neovim
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/playground'
-
-" Syntax
-Plug 'cakebaker/scss-syntax.vim'
-Plug 'calviken/vim-gdscript3'
-Plug 'editorconfig/editorconfig-vim'
-Plug 'jparise/vim-graphql'
-"Plug 'jason0x43/vim-js-indent'
-"Plug 'maxmellon/vim-jsx-pretty'
-"Plug 'pangloss/vim-javascript'
-"Plug 'peitalin/vim-jsx-typescript'
-
 call plug#end() 
 
 
