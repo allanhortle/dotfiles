@@ -66,7 +66,8 @@ set showcmd
 set smartcase                   " ignore case if search pattern is all lower-case case-sensitive otherwise
 set smarttab                    " insert tabs on the start of a line according to shiftwidth, not tabstop
 set softtabstop=4
-set splitright                  " set vertical splits to the right
+set splitright                  
+set splitbelow                 
 set synmaxcol=500               " stop checking syntax regexes after 500, hopefully prettier makes this fine
 set fillchars=vert:\            " set empty vert chartacter
 set suffixesadd=.jsx,.md,.js
@@ -90,6 +91,9 @@ if !has('nvim')
     set ttymouse=sgr                " make the mouse work after line 223
     set backupdir^=~/.vim/backup//  " keep all the backup files in .vim
     set undodir^=~/.vim/undo//
+    colorscheme puffin
+else 
+    colorscheme ts-colors
 endif
 
 " Cursor types
@@ -108,6 +112,13 @@ augroup END
 " Disable auto commenting
 autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 filetype plugin on
+
+
+" Make help vertical
+augroup vimrc_help
+  autocmd!
+  autocmd BufEnter *.txt if &buftype == 'help' | wincmd L | endif
+augroup END
 
 
 "
@@ -201,9 +212,6 @@ map <F6> :setlocal spell! spelllang=en_au<CR>
 map <F7> :Goyo<CR>
 map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
-" Make help vertical
-cnoreabbrev <expr> help ((getcmdtype() is# ':'    && getcmdline() is# 'help')?('vert help'):('help'))
-cnoreabbrev <expr> h ((getcmdtype() is# ':'    && getcmdline() is# 'h')?('vert help'):('h'))
 
 " Wrapped navigation
 nnoremap j gj
@@ -293,7 +301,6 @@ syntax on
 if &diff
     syntax off
 endif
-colorscheme ts-colors
 
 
 "
