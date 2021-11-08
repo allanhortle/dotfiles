@@ -66,6 +66,11 @@ zstyle ':vcs_info:git*' actionformats "%a%b%m  "
 zstyle ':vcs_info:*+*:*' debug false
 zstyle ':vcs_info:git*+set-message:*' hooks git-extras
 
+zstyle ':completion:*' matcher-list '' \
+  'm:{a-z\-}={A-Z\_}' \
+  'r:[^[:alpha:]]||[[:alpha:]]=** r:|=* m:{a-z\-}={A-Z\_}' \
+  'r:|?=** m:{a-z\-}={A-Z\_}'
+
 function git_changes() {
     local num="$(echo $1 | grep $2 | wc -l | xargs echo)"
     if [[ "$num" -gt 0 ]]; then
