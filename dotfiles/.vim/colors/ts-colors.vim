@@ -18,19 +18,23 @@ hi Type ctermfg=white cterm=none
 hi Special ctermfg=white cterm=none
 hi Statement ctermfg=white cterm=none
 hi Title ctermfg=white cterm=none
+hi Nothing ctermfg=white cterm=none
 
 
 " Tree Sitter
 hi TSConditional ctermfg=red cterm=none
-hi TSConstant ctermfg=blue cterm=none
+hi TSConstBuiltin ctermfg=blue cterm=none
 hi TSBoolean ctermfg=blue cterm=none
 hi TSNumber ctermfg=blue cterm=none
 hi TSKeyword ctermfg=red cterm=none
+hi TSVariableBuiltin ctermfg=red cterm=none
 hi TSKeywordFunction ctermfg=red cterm=none
 hi TSKeywordOperator ctermfg=red cterm=none
 hi TSLabel ctermfg=yellow cterm=none
 hi TSString ctermfg=green cterm=none
 hi TSTag ctermfg=yellow cterm=none
+hi TSTagDelimiter ctermfg=yellow cterm=none
+hi TSTagAttribute ctermfg=yellow cterm=none
 hi TSType ctermfg=magenta cterm=none
 
 " Tree Sitter Overrides
