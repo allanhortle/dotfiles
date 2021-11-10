@@ -4,6 +4,6 @@
 # clone the repo into ~/dotfiles
 cd dotfiles
 ./install.sh
-./install-apps.sh
+./apps.sh
 stow dotfiles --no-folding
 ```
