@@ -104,7 +104,7 @@ local jsx_highlights = [[
 (jsx_closing_element) @tag
 ]];
 
-require('vim.treesitter.query').set_query("tsx", "highlights", highlights .. jsx_highlights)
-require('vim.treesitter.query').set_query("typescript", "highlights", highlights)
+--require('vim.treesitter.query').set_query("tsx", "highlights", highlights .. jsx_highlights)
+--require('vim.treesitter.query').set_query("typescript", "highlights", highlights)
 
 

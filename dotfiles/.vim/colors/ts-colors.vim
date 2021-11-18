@@ -68,6 +68,8 @@ hi Visual ctermbg=240
 hi WarningMsg ctermfg=yellow ctermbg=black
 hi StartifyHeader ctermfg=yellow 
 hi StartifySection ctermfg=242 
+hi StartifyNumber ctermfg=blue 
+hi StartifyBracket ctermfg=blue 
 
 " vim script
 hi vimCommand ctermfg=red
