@@ -31,3 +31,5 @@
 	path = nvim
 [mergetool "vimdiff"]
 	path = nvim
+[init]
+	defaultBranch = main
