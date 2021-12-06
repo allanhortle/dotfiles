@@ -1,8 +1,13 @@
 ; Keywords
 [
     "import"
+    "default"
+    "as"
+    "from"
+    "try"
+    "catch"
+    "finally"
 ] @keyword
-
 
 ; Overrides
 [
@@ -16,21 +21,13 @@
     (type_annotation) 
     (type_alias_declaration)
     (type_parameters) 
-] @type (#set! "priority" 101)
+] @foo (#set! "priority" 200)
 
 ;(type_alias_declaration (identifier) @tag)
 (type_alias_declaration value: (_) @type (#set! "priority" 205)) @type
 
 
-; JSX
-;((jsx_expression ["{" "}"] @tag) (#set! "priority" 101))
-;(jsx_attribute [(property_identifier) "="] @tag) 
-;(jsx_opening_element ["<" ">"] @tag)
-;(jsx_opening_element name: (_) @tag)
-;(jsx_self_closing_element name: (_) @tag)
-;(jsx_self_closing_element ["<" ">" "/"] @tag)
-;(jsx_fragment ["<" ">" "/"] @tag)
-;((jsx_closing_element (identifier) @tag (#set! "priority" 205)))
+
 
 
 ; Builtin Objects

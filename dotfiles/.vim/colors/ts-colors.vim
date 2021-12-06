@@ -30,6 +30,7 @@ hi TSKeywordFunction ctermfg=red cterm=NONE
 hi TSKeywordOperator ctermfg=red cterm=NONE
 hi TSLabel ctermfg=yellow cterm=NONE
 hi TSString ctermfg=green cterm=NONE
+hi TSStringRegex ctermfg=green cterm=NONE
 hi TSTag ctermfg=yellow cterm=NONE
 hi TSTagDelimiter ctermfg=yellow cterm=NONE
 hi TSTagAttribute ctermfg=yellow cterm=NONE
@@ -99,3 +100,16 @@ hi DiffChange ctermfg=white ctermbg=NONE cterm=NONE
 hi DiffText ctermfg=blue ctermbg=NONE cterm=NONE
 
 
+hi markdownH1 ctermfg=yellow
+hi markdownH1Delimiter ctermfg=yellow
+hi markdownH2 ctermfg=green
+hi markdownH2Delimiter ctermfg=green
+hi markdownH3 ctermfg=blue
+hi markdownH3Delimiter ctermfg=blue
+hi markdownHeadingRule ctermfg=yellow
+
+hi markdownCodeDelimiter ctermfg=magenta
+hi markdownCode ctermfg=magenta
+
+hi markdownItalic cterm=italic
+hi markdownBold cterm=bold
