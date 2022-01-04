@@ -1,12 +1,17 @@
 ; Keywords
 [
-    "import"
-    "default"
     "as"
-    "from"
-    "try"
     "catch"
+    "catch"
+    "default"
     "finally"
+    "for"
+    "from"
+    "import"
+    "of"
+    "throw"
+    "try"
+    "while"
 ] @keyword
 
 ; Overrides

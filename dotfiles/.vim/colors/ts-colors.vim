@@ -22,6 +22,7 @@ hi Nothing ctermfg=white cterm=NONE
 " Tree Sitter
 hi TSConditional ctermfg=red cterm=NONE
 hi TSConstBuiltin ctermfg=blue cterm=NONE
+hi TSRepeat ctermfg=red cterm=NONE
 hi TSBoolean ctermfg=blue cterm=NONE
 hi TSNumber ctermfg=blue cterm=NONE
 hi TSKeyword ctermfg=red cterm=NONE
@@ -35,6 +36,7 @@ hi TSTag ctermfg=yellow cterm=NONE
 hi TSTagDelimiter ctermfg=yellow cterm=NONE
 hi TSTagAttribute ctermfg=yellow cterm=NONE
 hi TSType ctermfg=magenta cterm=NONE
+hi TSTypeBuiltin ctermfg=magenta cterm=NONE
 
 " Tree Sitter Overrides
 hi tmuxCommands ctermfg=red cterm=NONE
@@ -100,16 +102,20 @@ hi DiffChange ctermfg=white ctermbg=NONE cterm=NONE
 hi DiffText ctermfg=blue ctermbg=NONE cterm=NONE
 
 
+"
+" markdown
+hi markdownBold cterm=bold
+hi markdownCode ctermfg=magenta
+hi markdownCodeDelimiter ctermfg=magenta
 hi markdownH1 ctermfg=yellow
 hi markdownH1Delimiter ctermfg=yellow
 hi markdownH2 ctermfg=green
 hi markdownH2Delimiter ctermfg=green
 hi markdownH3 ctermfg=blue
 hi markdownH3Delimiter ctermfg=blue
+hi markdownH4 ctermfg=magenta
+hi markdownH4Delimiter ctermfg=magenta
+hi markdownH5 ctermfg=red
+hi markdownH5Delimiter ctermfg=red
 hi markdownHeadingRule ctermfg=yellow
-
-hi markdownCodeDelimiter ctermfg=magenta
-hi markdownCode ctermfg=magenta
-
 hi markdownItalic cterm=italic
-hi markdownBold cterm=bold

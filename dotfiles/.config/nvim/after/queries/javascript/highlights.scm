@@ -1,3 +1,10 @@
+; keywords
+
+[
+    "import"
+    "from"
+] @keyword
+
 ; JSX
 ((jsx_expression ["{" "}"] @tag) (#set! "priority" 101))
 (jsx_attribute [(property_identifier) "="] @tag) 

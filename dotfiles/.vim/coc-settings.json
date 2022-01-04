@@ -6,6 +6,7 @@
         "json",
         "graphql"
     ],
+    "javascript.validate.enable": false,
     "tsserver.log": "normal",
     "explorer.file.showHiddenFiles": true,
     "explorer.quitOnOpen": true,
