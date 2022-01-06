@@ -2,10 +2,10 @@
 [
     "as"
     "catch"
-    "catch"
     "default"
     "finally"
     "for"
+    "from"
     "from"
     "import"
     "of"
@@ -19,6 +19,12 @@
     "?"
     ":"
 ] @Nothing
+
+; constants
+[
+    (undefined)
+] @constant
+
 
 ; Types
 [

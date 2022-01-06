@@ -20,23 +20,24 @@ hi Nothing ctermfg=white cterm=NONE
 
 
 " Tree Sitter
+hi TSBoolean ctermfg=blue cterm=NONE
 hi TSConditional ctermfg=red cterm=NONE
 hi TSConstBuiltin ctermfg=blue cterm=NONE
-hi TSRepeat ctermfg=red cterm=NONE
-hi TSBoolean ctermfg=blue cterm=NONE
-hi TSNumber ctermfg=blue cterm=NONE
+hi TSConstant ctermfg=blue cterm=NONE
 hi TSKeyword ctermfg=red cterm=NONE
-hi TSVariableBuiltin ctermfg=red cterm=NONE
 hi TSKeywordFunction ctermfg=red cterm=NONE
 hi TSKeywordOperator ctermfg=red cterm=NONE
 hi TSLabel ctermfg=yellow cterm=NONE
+hi TSNumber ctermfg=blue cterm=NONE
+hi TSRepeat ctermfg=red cterm=NONE
 hi TSString ctermfg=green cterm=NONE
 hi TSStringRegex ctermfg=green cterm=NONE
 hi TSTag ctermfg=yellow cterm=NONE
-hi TSTagDelimiter ctermfg=yellow cterm=NONE
 hi TSTagAttribute ctermfg=yellow cterm=NONE
+hi TSTagDelimiter ctermfg=yellow cterm=NONE
 hi TSType ctermfg=magenta cterm=NONE
 hi TSTypeBuiltin ctermfg=magenta cterm=NONE
+hi TSVariableBuiltin ctermfg=red cterm=NONE
 
 " Tree Sitter Overrides
 hi tmuxCommands ctermfg=red cterm=NONE
