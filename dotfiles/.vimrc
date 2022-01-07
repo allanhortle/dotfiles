@@ -17,6 +17,7 @@ Plug 'iberianpig/tig-explorer.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' } 
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/vim-peekaboo'
+Plug 'jxnblk/vim-mdx-js'
 Plug 'mattn/emmet-vim'
 Plug 'mbbill/undotree'
 Plug 'mhinz/vim-startify'
@@ -294,6 +295,7 @@ nnoremap q: <nop>
 augroup filetypedetect
     au BufRead,BufNewFile *.jsx set filetype=javascript
     au BufRead,BufNewFile *.tsx set filetype=typescript.tsx
+    au BufNewFile,BufRead *.mdx set filetype=mdx
 augroup END
 
 syntax reset
