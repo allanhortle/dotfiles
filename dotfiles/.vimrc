@@ -36,6 +36,7 @@ Plug 'editorconfig/editorconfig-vim'
 " Neovim
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/playground'
+Plug 'David-Kunz/treesitter-unit'
 call plug#end() 
 
 
@@ -145,6 +146,8 @@ autocmd! User GoyoLeave call <SID>goyo_leave()
 " FZF
 let g:fzf_preview_window = ''
 let g:fzf_layout = { 'up': '50%' }
+command! -bang -nargs=? -complete=dir Files call fzf#vim#files(<q-args>, {'options': ['-i']}, <bang>0)
+
 
 " Startify
 let g:startify_change_to_dir = 0
@@ -201,6 +204,14 @@ nmap <leader>rn <Plug>(coc-rename)
 nnoremap <silent> K :call CocAction('doHover')<CR>
 nnoremap <C-O> :CocCommand explorer<CR>
 nnoremap <C-L> :execute 'CocCommand explorer ' . expand('%:h')<CR>
+
+
+"
+" units
+xnoremap iu :lua require"treesitter-unit".select()<CR>
+xnoremap au :lua require"treesitter-unit".select(true)<CR>
+onoremap iu :<c-u>lua require"treesitter-unit".select()<CR>
+onoremap au :<c-u>lua require"treesitter-unit".select(true)<CR>
 
 
 "
