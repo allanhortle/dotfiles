@@ -226,7 +226,7 @@ alias prl="gh pr list"
 alias changes="gh pr diff | delta -s"
 
 # data
-alias album="vd ~/Dropbox/data/albums.csv"
+alias music="vd --quitguard ~/Dropbox/data/albums.csv"
 alias to='vim ~/Dropbox/bigdatr.md'
 
 # npm
