@@ -3,7 +3,6 @@ if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
 fi
 
-
 autoload -U compinit
 autoload -U colors && colors
 autoload -Uz vcs_info
@@ -139,7 +138,7 @@ function precmd() {
 # 
 
 eval "$(fasd --init auto)"
-eval "$(fnm env --use-on-cd)"
+eval "$(fnm env --fnm-dir=$HOME/.fnm --use-on-cd)"
 export CLICOLOR=1
 export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git"'
 export FZF_DEFAULT_OPTS='--color=16,bg+:-1,pointer:2,prompt:2,hl+:2,hl:2,fg+:2'
