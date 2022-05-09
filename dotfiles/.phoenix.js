@@ -1,21 +1,38 @@
+function notAlacritty() {
+    const window = Window.focused();
+    return window && window.app().name() !== 'Alacritty';
+}
+
 Key.on('escape', ['option'], () => {
     const app = App.get('Alacritty');
     if (app) app.isActive() ? app.hide() : app.focus();
 });
 
-Key.on('space', ['control'], () => {
-    const screenFrame = Screen.main().flippedVisibleFrame();
-    const modal = new Modal();
-    modal.isInput = true;
-    modal.appearance = 'dark';
-    modal.origin = {
-        x: screenFrame.width / 2 - modal.frame().width / 2,
-        y: screenFrame.height / 2 - modal.frame().height / 2
-    };
-    modal.textDidChange = (value) => {
-        //console.log('Text did change:', value);
-    };
-    modal.show();
+// Maximise
+Key.on('space', ['command', 'option'], () => {
+    const frame = Screen.main().visibleFrame();
+    const window = Window.focused();
+    if (notAlacritty) window.maximise();
+});
 
-    Key.once('escape', [], (e) => modal.close());
+// Right Half
+Key.on('right', ['command', 'option'], () => {
+    const screen = Screen.main().flippedVisibleFrame();
+    const window = Window.focused();
+
+    if (notAlacritty) {
+        window.setSize({width: screen.width / 2, height: screen.height});
+        window.setTopLeft({x: screen.x + screen.width / 2, y: 0});
+    }
+});
+
+// Left Half
+Key.on('left', ['command', 'option'], () => {
+    const screen = Screen.main().flippedVisibleFrame();
+    const window = Window.focused();
+
+    if (notAlacritty) {
+        window.setSize({width: screen.width / 2, height: screen.height});
+        window.setTopLeft({x: 0, y: 0});
+    }
 });
