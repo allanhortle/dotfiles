@@ -10,7 +10,9 @@ endif
 call plug#begin('~/.vim/plugged')
 Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
 Plug 'airblade/vim-gitgutter'
+Plug 'beloglazov/vim-online-thesaurus'
 Plug 'benmills/vimux'
+Plug 'dhruvasagar/vim-zoom'
 Plug 'docunext/closetag.vim'
 Plug 'dyng/ctrlsf.vim'
 Plug 'iberianpig/tig-explorer.vim'
@@ -46,10 +48,13 @@ call plug#end()
 set autoindent                  " always set auto-indenting on
 set background=dark
 set backspace=indent,eol,start  " allow backspacing over everything in insert mode
+set backupcopy=auto             " use rename-and-write-new method whenever safe
+set colorcolumn=100
 set complete=.,w,b,u,i          " turn off tab completion for tags
 set copyindent                  " copy the previous indentation on auto-indenting
 set encoding=utf8
 set expandtab
+set fillchars=vert:\            " set empty vert chartacter
 set foldlevel=20
 set hidden
 set hlsearch
@@ -57,36 +62,34 @@ set ignorecase                  " ignore case when searching
 set incsearch                   " show search matches as you type
 set lazyredraw                  " dont redraw in the middle of a macro
 set mouse=a
+set nobackup                    " but do not persist backup after successful write
+set noswapfile                  " dont have swap files, they are lame.
 set nowrap
 set number                      " always show line numbers
+set numberwidth=1               " make line numbers closer to ~
 set rtp+=/usr/local/opt/fzf
 set shiftround                  " use multiple of shiftwidth when indenting with '<' and '>'
 set shiftwidth=4                " number of spaces to use for auto-indenting
-set signcolumn=number
-set showmatch                   " set show matching 
 set showcmd
+set showmatch                   " set show matching 
+set signcolumn=number
 set smartcase                   " ignore case if search pattern is all lower-case case-sensitive otherwise
 set smarttab                    " insert tabs on the start of a line according to shiftwidth, not tabstop
 set softtabstop=4
-set splitright                  
 set splitbelow                 
-set synmaxcol=500               " stop checking syntax regexes after 500, hopefully prettier makes this fine
-set fillchars=vert:\            " set empty vert chartacter
+set splitright                  
+set spellsuggest=best,10
 set suffixesadd=.jsx,.md,.js
-set t_Co=256
+set synmaxcol=500               " stop checking syntax regexes after 500, hopefully prettier makes this fine
 set t_BE=
+set t_Co=256
 set tabstop=4                   " a tab is four spaces
 set timeoutlen=1000 ttimeoutlen=0
+set undofile                    " persist the undo tree for each file
 set updatetime=100
 set wildmenu
 set wildmode=longest:full,full
-set numberwidth=1               " make line numbers closer to ~
-set colorcolumn=100
 set writebackup                 " protect against crash-during-write
-set nobackup                    " but do not persist backup after successful write
-set backupcopy=auto             " use rename-and-write-new method whenever safe
-set undofile                    " persist the undo tree for each file
-set noswapfile                  " dont have swap files, they are lame.
 
 " Vim only settings
 if !has('nvim')
@@ -126,6 +129,9 @@ augroup END
 "
 " Plugin Settings
 "
+
+" nerdcommenter
+let g:NERDCompactSexyComs = 1
 
 " markdown
 let g:markdown_fold_style = 'nested'
@@ -175,7 +181,8 @@ let g:coc_global_extensions = [
     \ 'coc-explorer',
     \ 'coc-lua',
     \ 'coc-vimlsp',
-    \ 'coc-styled-components'
+    \ 'coc-styled-components',
+    \ 'coc-snippets'
 \ ]
 
 if isdirectory('./node_modules') && isdirectory('./node_modules/prettier')
@@ -265,6 +272,7 @@ nnoremap <Leader>tt :Tig<CR>
 nnoremap <Leader>ts :TigStatus<CR>
 nnoremap <Leader>th :TigOpenCurrentFile<CR>
 nnoremap <Leader>tb :TigBlame<CR>
+let g:tig_explorer_use_builtin_term=0
 
 " windows
 nnoremap <Leader><Tab> <C-W>w

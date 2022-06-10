@@ -6,14 +6,20 @@
         "json",
         "graphql"
     ],
-    "javascript.validate.enable": false,
-    "tsserver.log": "normal",
+    "coc.preferences.rootPatterns": ["package.json", ".git"],
+    "coc.source.dictionary.filetypes": ["markdown"],
+    "coc.source.word.filetypes": ["markdown"],
     "explorer.file.showHiddenFiles": true,
     "explorer.quitOnOpen": true,
-    "prettier.semi": true,
-    "prettier.tabWidth": 4,
-    "prettier.singleQuote": true,
+    "javascript.validate.enable": false,
     "prettier.bracketSpacing": false,
+    "prettier.printWidth": 100,
+    "prettier.semi": true,
+    "prettier.singleQuote": true,
+    "prettier.tabWidth": 4,
     "prettier.trailingComma": "none",
-    "prettier.printWidth": 100
+    "tsserver.log": "verbose",
+    "tsserver.trace.server": "verbose",
+    "typescript.autoClosingTags": false,
+    "workspace.bottomUpFiletypes": ["typescriptreact", "typescript"]
 }
