@@ -1,1 +1,3 @@
 set main-view-id = true
+
+color cursor black green
