@@ -14,7 +14,7 @@ hi Comment ctermfg=242 cterm=italic
 hi Constant ctermfg=blue cterm=none
 
 
-hi Statement ctermfg=white cterm=none
+hi Statement ctermfg=red cterm=none
 hi Identifier ctermfg=white cterm=none
 hi PreProc ctermfg=white cterm=none
 hi Type ctermfg=white cterm=none

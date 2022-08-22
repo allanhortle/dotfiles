@@ -5,18 +5,22 @@ if exists("syntax_on")
 endif
 let g:colors_name = "ts-colors"
 
+
 " Reset
 hi Normal cterm=NONE ctermfg=white ctermbg=NONE
 hi Comment ctermfg=242 cterm=italic
-hi Constant ctermfg=white cterm=NONE
-hi Statement ctermfg=white cterm=NONE
 hi Identifier ctermfg=white cterm=NONE
 hi PreProc ctermfg=white cterm=NONE
 hi Type ctermfg=white cterm=NONE
 hi Special ctermfg=white cterm=NONE
-hi Statement ctermfg=white cterm=NONE
 hi Title ctermfg=white cterm=NONE
 hi Nothing ctermfg=white cterm=NONE
+hi TSOperator ctermfg=white cterm=NONE
+
+" Defaults
+hi Constant ctermfg=green cterm=NONE
+hi Statement ctermfg=red cterm=NONE
+
 
 
 " Tree Sitter
@@ -38,6 +42,7 @@ hi TSTagDelimiter ctermfg=yellow cterm=NONE
 hi TSType ctermfg=magenta cterm=NONE
 hi TSTypeBuiltin ctermfg=magenta cterm=NONE
 hi TSVariableBuiltin ctermfg=red cterm=NONE
+hi TSVariable ctermfg=white cterm=NONE
 
 " Tree Sitter Overrides
 hi tmuxCommands ctermfg=red cterm=NONE

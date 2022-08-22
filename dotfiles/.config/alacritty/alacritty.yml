@@ -27,6 +27,7 @@ font:
 
 key_bindings:
   - { key: Key6, mods: Control, chars: "\x1e" } # some dodgy hack cause ctrl + 6 stopped working
+  - { key: F11, action: ToggleFullscreen }
 
 
 #colors:

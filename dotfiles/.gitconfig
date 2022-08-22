@@ -7,6 +7,7 @@
 	email = allanhortle@gmail.com
 [push]
     default = current
+    autoSetupRemote = true
 [merge]
 	conflictstyle = merge
 	tool = vimdiff
@@ -25,7 +26,7 @@
 	ui = true
 
 [tig "bind"]
-        generic = D !git difftool --tool=vimdiff --no-prompt --trust-exit-code %(commit)^!
+    generic = D !git difftool --tool=vimdiff --no-prompt --trust-exit-code %(commit)^!
 
 [difftool "vimdiff3"]
 	path = nvim

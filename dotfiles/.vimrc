@@ -34,6 +34,7 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tweekmonster/startuptime.vim'
 Plug 'editorconfig/editorconfig-vim'
+Plug 'vim-ctrlspace/vim-ctrlspace'
 
 " Neovim
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -167,6 +168,7 @@ let g:startify_lists = [
 " ctrlsf
 let g:ctrlsf_auto_focus = { "at": "start" }
 let g:ctrlsf_populate_qflist = 1
+let g:ctrlsf_extra_backend_args={ 'rg': '-U' }
 let g:coc_node_path = '~/.fnm/aliases/default/bin/node'
 
 
@@ -250,7 +252,20 @@ nnoremap <CR> :noh<CR><CR>
 nnoremap <Leader>h :Startify<CR>
 nnoremap <Leader>b :bp<CR>
 nnoremap <Leader>e :CocList --normal -A diagnostics<CR>
-nnoremap <Leader>a :CocAction<CR>
+
+" Applying codeAction to the selected region.
+" Example: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
+nmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
+
+" Remap keys for applying codeAction to the current buffer.
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" Run the Code Lens action on the current line.
+nmap <leader>cl  <Plug>(coc-codelens-action)
+
 nnoremap <Leader>f :bn<CR>
 nnoremap <Leader>t :TSHighlightCapturesUnderCursor<CR>
 nnoremap <Leader>q :bp \|bw #<CR>

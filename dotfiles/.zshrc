@@ -185,15 +185,31 @@ function root() {
     cd - 
 }
 
+
 #
 # Tmux
 #
 function tmux() {
     if [[ -n "$@" ]]; then
         command tmux "$@"
+
+    elif [[ -n "$TMUX" ]]; then
+        echo 'tmux is running'
     else 
         tmux attach || tmux new
     fi
+}
+
+function layout() {
+    # get the number of panes in the window
+    let panes=$(tmux display-message -p "#{window_panes}")
+    let make=$((3 - panes)) 
+    # make new windows up to a max of 3
+    repeat make {tmux split-window}; 
+    # do the layout
+    tmux select-layout main-vertical
+    tmux resize-pane -t 1 -x 180
+    tmux select-pane -t 1
 }
 
 
@@ -257,4 +273,5 @@ alias ...="../.."
 if [ -f ~/.zshrc.local ]; then
     source ~/.zshrc.local
 fi
+
 
