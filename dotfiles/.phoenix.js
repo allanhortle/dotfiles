@@ -8,6 +8,11 @@ Key.on('escape', ['option'], () => {
     if (app) app.isActive() ? app.hide() : app.focus();
 });
 
+Key.on('`', ['option'], () => {
+    const app = App.get('Alacritty');
+    if (app) app.isActive() ? app.hide() : app.focus();
+});
+
 // Maximise
 Key.on('space', ['command', 'option'], () => {
     const frame = Screen.main().visibleFrame();

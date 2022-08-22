@@ -101,12 +101,12 @@ function +vi-git-extras(){
     fi
 
     # Ahead/Behind/Conficts
-    local num_ahead=$(echo $changes | head -1 | pcregrep -io1 "ahead (\d+)")
+    local num_ahead=$(echo $changes | head -1 | rg 'ahead (\d+)' -or '$1')
     if [ "$num_ahead" -gt 0 ]; then
         hook_com[misc]+=" ⬆ $num_ahead"
     fi
 
-    local num_behind=$(echo $changes | head -1 | pcregrep -io1 "behind (\d+)")
+    local num_behind=$(echo $changes | head -1 | rg 'behind (\d+)' -or '$1')
     if [ "$num_behind" -gt 0 ]; then
         hook_com[misc]+=" ⬇ $num_behind"
     fi
