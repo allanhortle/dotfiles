@@ -20,7 +20,7 @@
     "prettier.singleQuote": true,
     "prettier.tabWidth": 4,
     "prettier.trailingComma": "none",
-    "suggest.noselect": false,
+    "suggest.noselect": true,
     "tsserver.log": "verbose",
     "tsserver.trace.server": "verbose",
     "typescript.autoClosingTags": false,
