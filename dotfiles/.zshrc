@@ -230,6 +230,7 @@ alias grbc='git rebase --continue'
 alias grba='git rebase --abort'
 alias gmt='git mergetool'
 alias gst='git status --short --branch'
+alias gs='git checkout $(gb | fzf)'
 alias gbmd='gb --merged | rg -v "(\*|master)" | xargs git branch -d'
 alias monodiff='git diff --name-only origin/master... | grep "packages" | sed "s/packages\/\([^\/]*\).*/\1/g" | uniq'
 alias monofiles='git diff --name-only origin/master...'
@@ -275,3 +276,10 @@ if [ -f ~/.zshrc.local ]; then
 fi
 
 
+
+# bun completions
+[ -s "/Users/allanhortle/.bun/_bun" ] && source "/Users/allanhortle/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"

@@ -1,8 +1,9 @@
 window:
   startup_mode: Maximized
+  startup_mode: SimpleFullscreen
   padding:
-    x: 0
-    y: 0
+    x: 8
+    y: 4
   decorations: none
 
 selection:
@@ -84,9 +85,11 @@ colors:
 
 colors:
   primary:
-    background: '0x212733'
     foreground: '0xd9d7ce'
-    background: '0x000000'
+    #background: '0x212733' # pale gray
+    #background: '0x000000' # black
+    #background: '0x180b25' # dark purple
+    background: '0x0b2325' # dark green
   normal:
     black:   '0x1A1F28'
     red:     '0xf07178'
