@@ -1,0 +1,59 @@
+{
+  "diagrams": {
+    "show": "none"
+  },
+  "include": [],
+  "instrument": {
+    "description": "Guitar, 6 strings, standard tuning",
+    "type": "guitar"
+  },
+  "pdf": {
+    "showlayout": false,
+    "even-odd-pages": 0,
+    "pagealign-songs": 0,
+    "formats": {
+      "title": {
+        "title": ["%{title}%{artist| - %{artist}|}", "", ""],
+        "subtitle": ["%{key|%{}  }%{time|%{}  }", "", ""]
+      }
+    },
+    "margintop": 96,
+    "labels": {
+      "comment": "comment"
+    },
+    "chorus": {
+      "bar": {"width": 1},
+      "indent": 0,
+      "recall": {
+        "tag": "",
+        "type": "comment"
+      }
+    },
+    "fonts": {
+      "chord": {
+        "name": "Helvetica-Bold"
+      },
+      "chordfingers": {},
+      "comment": {},
+      "comment_box": {},
+      "comment_italic": {},
+      "grid": {
+        "name": "Helvetica-Bold"
+      },
+      "tab": {},
+      "text": {
+        "name": "Helvetica"
+      },
+      "title": {
+        "name": "Helvetica-Bold"
+      },
+      "toc": {
+        "name": "Helvetica"
+      }
+    }
+  },
+  "user": {
+    "fullname": "Allan Hortle",
+    "name": "allanhortle"
+  }
+}
