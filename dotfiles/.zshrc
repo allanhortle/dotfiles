@@ -222,7 +222,7 @@ alias gb='git branch --sort=committerdate'
 alias ga='git add -A :/'
 alias gc='git commit'
 alias gco='git checkout'
-alias gf='git fetch -p'
+alias gf='git fetch --all -p'
 alias gl='git pull'
 alias gp='git push'
 alias grb='git rebase'
@@ -243,7 +243,7 @@ alias changes="gh pr diff | delta -s"
 
 # data
 alias music="vd --quitguard ~/Dropbox/data/albums.csv"
-alias to='vim ~/Dropbox/bigdatr.md'
+alias to='vim ~/Dropbox/work.md'
 
 # npm
 alias npm_patch_publish='npm version patch && git push --follow-tags && npm publish'

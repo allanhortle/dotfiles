@@ -50,7 +50,7 @@ set autoindent                  " always set auto-indenting on
 set background=dark
 set backspace=indent,eol,start  " allow backspacing over everything in insert mode
 set backupcopy=auto             " use rename-and-write-new method whenever safe
-set colorcolumn=100
+set colorcolumn=120
 set complete=.,w,b,u,i          " turn off tab completion for tags
 set copyindent                  " copy the previous indentation on auto-indenting
 set encoding=utf8
@@ -341,6 +341,9 @@ augroup filetypedetect
     au BufNewFile,BufRead *.mdx set filetype=mdx
 augroup END
 
+" json comments
+autocmd FileType json syntax match Comment +\/\/.\+$+
+
 syntax reset
 syntax on
 if &diff
@@ -413,11 +416,11 @@ function! StatusLine() abort
     if g:actual_curwin !=? win_getid() 
         let l:color = "%#InactiveColor#" 
     else 
-        let l:color = "%#" . get(l:modecolors, l:currentmode, 'StatusLine') . "#"
+        let l:color = "%#" .. get(l:modecolors, l:currentmode, 'StatusLine') .. "#"
     endif
 
     " Construct content
-    let statusline="".l:color." ".l:currentmode
+    let statusline=""..l:color.." "..l:currentmode
     let statusline.="  %(%-0.75f%{&modified?\"*\":\"\"}%)"
 
     "let statusline.= l:errortext
@@ -427,6 +430,43 @@ function! StatusLine() abort
     return statusline
 
 endfunction
-
 set statusline=%{%StatusLine()%}
 
+function! TabLine() abort
+    let s = ''
+    " loop through each tab page
+    for t in range(tabpagenr('$'))
+        let index = t + 1
+        " select the highlighting for the buffer names
+        if index == tabpagenr()
+            let s .= '%#TabLineSel#'
+        else
+            let s .= '%#TabLine#'
+        endif
+
+        " set up tab number for mouse clicks
+        let s .= '%'..index..'T'
+
+        " set page number string
+        let s .= '['..index..'] '
+
+        let name = ''
+        " loop through each buffer in a tab
+        for b in tabpagebuflist(index)
+            let buffer = fnamemodify(bufname(b), ':t')
+            if getbufvar(b, '&buftype', '') != 'nofile' " ignore coc floating buffers
+                if buffer != ''
+                    let name .= buffer..'|'
+                else 
+                    let name .= '-|'
+                endif
+            endif
+        endfor
+        " remove last pipe
+        let name = substitute(name, '.$', '', '')
+        let s .= name..'  '
+
+    endfor
+    return s
+endfunction
+set tabline=%{%TabLine()%}
