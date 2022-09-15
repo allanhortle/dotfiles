@@ -128,3 +128,14 @@ hi TSTitleH2 ctermfg=green
 hi TSTitleH3 ctermfg=blue
 "hi markdownHeadingRule ctermfg=yellow
 "hi markdownItalic cterm=italic
+
+"
+" Chordpro
+hi chordproTag ctermfg=242
+hi chordproDirective ctermfg=242
+hi chordproDirWithOpt ctermfg=242
+hi chordproOptions ctermfg=242
+
+hi chordproChord ctermfg=blue
+hi chordproBracket ctermfg=blue
+
