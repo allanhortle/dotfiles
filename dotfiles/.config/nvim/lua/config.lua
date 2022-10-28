@@ -7,9 +7,26 @@ require('nvim-treesitter.configs').setup {
     }
 }
 
-require"nvim-treesitter.highlight".set_custom_captures {
-    -- Highlight the @foo.bar capture group with the "Identifier" highlight group.
-    ["text.titleH2"] = "TSTitleH2",
-    ["text.titleH3"] = "TSTitleH3"
-}
+local actions = require('telescope.actions');
+require('telescope').setup({
+    defaults = {
+        prompt_prefix = " ",
+        mappings = {
+            i = {
+                ["<esc>"] = actions.close,
+            },
+        }
+    },
+    pickers = {
+        buffers = {
+            theme = 'dropdown',
+            previewer = false,
+        },
+        find_files = {
+            find_command = {"rg","--ignore","--hidden","--files", "--glob", "!.git"},
+            theme = 'dropdown',
+            previewer = false,
+        }
+    }
+})
 
