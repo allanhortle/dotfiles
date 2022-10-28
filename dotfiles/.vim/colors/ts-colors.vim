@@ -15,7 +15,7 @@ hi Type ctermfg=white cterm=NONE
 hi Special ctermfg=white cterm=NONE
 hi Title ctermfg=white cterm=NONE
 hi Nothing ctermfg=white cterm=NONE
-hi TSOperator ctermfg=white cterm=NONE
+hi @operator ctermfg=white cterm=NONE
 
 " Defaults
 hi Constant ctermfg=green cterm=NONE
@@ -24,25 +24,29 @@ hi Statement ctermfg=red cterm=NONE
 
 
 " Tree Sitter
-hi TSBoolean ctermfg=blue cterm=NONE
-hi TSConditional ctermfg=red cterm=NONE
-hi TSConstBuiltin ctermfg=blue cterm=NONE
-hi TSConstant ctermfg=blue cterm=NONE
-hi TSKeyword ctermfg=red cterm=NONE
-hi TSKeywordFunction ctermfg=red cterm=NONE
-hi TSKeywordOperator ctermfg=red cterm=NONE
-hi TSLabel ctermfg=yellow cterm=NONE
-hi TSNumber ctermfg=blue cterm=NONE
-hi TSRepeat ctermfg=red cterm=NONE
-hi TSString ctermfg=green cterm=NONE
-hi TSStringRegex ctermfg=green cterm=NONE
-hi TSTag ctermfg=yellow cterm=NONE
-hi TSTagAttribute ctermfg=yellow cterm=NONE
-hi TSTagDelimiter ctermfg=yellow cterm=NONE
-hi TSType ctermfg=magenta cterm=NONE
-hi TSTypeBuiltin ctermfg=magenta cterm=NONE
-hi TSVariableBuiltin ctermfg=red cterm=NONE
-hi TSVariable ctermfg=white cterm=NONE
+hi @boolean ctermfg=blue cterm=NONE
+hi @conditional ctermfg=red cterm=NONE
+hi @constant.builtin ctermfg=blue cterm=NONE
+hi @constant ctermfg=blue cterm=NONE
+hi @keyword ctermfg=red cterm=NONE
+hi @include ctermfg=red cterm=NONE
+hi @keyword.function ctermfg=red cterm=NONE
+hi @keyword.operator ctermfg=red cterm=NONE
+hi @label ctermfg=yellow cterm=NONE
+hi @number ctermfg=blue cterm=NONE
+hi @repeat ctermfg=red cterm=NONE
+hi @string ctermfg=green cterm=NONE
+hi @string.regex ctermfg=green cterm=NONE
+hi @tag ctermfg=yellow cterm=NONE
+hi @tag.attribute ctermfg=yellow cterm=NONE
+hi @tagDelimiter ctermfg=yellow cterm=NONE
+hi @type ctermfg=magenta cterm=NONE
+hi @type.builtin ctermfg=magenta cterm=NONE
+hi @variable.builtin ctermfg=red cterm=NONE
+hi @variable ctermfg=white cterm=NONE
+hi @comment ctermfg=242 cterm=NONE
+
+hi typescriptTypeBrackets ctermfg=magenta cterm=NONE
 
 " Tree Sitter Overrides
 hi tmuxCommands ctermfg=red cterm=NONE

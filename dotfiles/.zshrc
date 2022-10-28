@@ -8,7 +8,12 @@ autoload -U colors && colors
 autoload -Uz vcs_info
 autoload -U up-line-or-beginning-search
 autoload -U down-line-or-beginning-search
+autoload -z edit-command-line
 compinit -i
+
+# Edit commands
+zle -N edit-command-line
+bindkey "^E" edit-command-line
 
 # History Search
 zle -N up-line-or-beginning-search
@@ -20,13 +25,22 @@ bindkey "^[[B" down-line-or-beginning-search # Down
 unsetopt correct_all  
 setopt extended_history
 setopt correct
-setopt auto_cd
+setopt nobeep
 setopt extended_history       # record timestamp of command in HISTFILE
 setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
 setopt hist_ignore_dups       # ignore duplicated commands history list
 setopt hist_ignore_space      # ignore commands that start with space
 setopt hist_verify            # show command with history expansion to user before running it
 setopt share_history          # share command history data
+
+# Dirs
+setopt auto_cd
+setopt auto_pushd 
+setopt pushd_minus 
+setopt pushd_to_home
+setopt pushd_silent
+setopt pushd_ignore_dups
+
 
 [ -z "$HISTFILE" ] && HISTFILE="$HOME/.zsh_history"
 [ "$HISTSIZE" -lt 50000 ] && HISTSIZE=50000
@@ -142,7 +156,7 @@ eval "$(fnm env --fnm-dir=$HOME/.fnm --use-on-cd)"
 export CLICOLOR=1
 export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git"'
 export FZF_DEFAULT_OPTS='--color=16,bg+:-1,pointer:2,prompt:2,hl+:2,hl:2,fg+:2'
-export EDITOR="/usr/local/bin/vim"
+export EDITOR="/opt/homebrew/bin/nvim"
 export HOMEBREW_NO_INSTALL_UPGRADE=1
 
 
@@ -234,6 +248,9 @@ alias gs='git checkout $(gb | fzf)'
 alias gbmd='gb --merged | rg -v "(\*|master)" | xargs git branch -d'
 alias monodiff='git diff --name-only origin/master... | grep "packages" | sed "s/packages\/\([^\/]*\).*/\1/g" | uniq'
 alias monofiles='git diff --name-only origin/master...'
+function git_fixup() {
+    git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup | git rebase -i --autosquash $1
+}
 
 # Github
 alias prs="gh pr status"
@@ -244,6 +261,24 @@ alias changes="gh pr diff | delta -s"
 # data
 alias music="vd --quitguard ~/Dropbox/data/albums.csv"
 alias to='vim ~/Dropbox/work.md'
+function links() {
+    gum spin --title "Fetching Raindrops" --show-output -- http -A bearer -a $RAINDROP_TOKEN GET https://api.raindrop.io/rest/v1/raindrops/0\?perpage=40\
+        | jq -r ".items[] | [.title, .link, (.created|split(\".\")[0] + \"Z\"|fromdate|strflocaltime(\"%b %d %H:%m\"))] | @csv"\
+        | gum table -c,,, -w 60,20,20  --height 40\
+        | cut -d "," -f 2\
+        | xargs open 
+}
+
+function pr() {
+    gh pr ls --json number,title,headRefName,state,statusCheckRollup\
+        | jq -r 'sort_by(.headRefName) | .[] | [.number, .state, (.statusCheckRollup | last | .conclusion), .title, .headRefName] | @csv'\
+        | gum table -c,,,,, -w 4,4,7,40,40\
+        | cut -d "," -f 1\
+        | awk '{print "https://github.com/bigdatr/bigdatr-v2/pull/"$1}'\
+        | xargs open 
+}
+
+alias scripts='cat package.json | jq -r ".scripts | to_entries | .[] | [.key, .value] | @csv" | gum table -c ,, -w 30,50 | cut -d "," -f 1 | xargs yarn run'
 
 # npm
 alias npm_patch_publish='npm version patch && git push --follow-tags && npm publish'
@@ -263,8 +298,9 @@ alias zr=". ~/.zshrc"
 alias k='kill -9'
 alias l='ls -lFha' 
 alias vim='nvim'
-#alias "-"='cd -'
+alias -- -='cd -'
 alias ...="../.."
+alias ip="http get https://api.myip.com | jq -r '.ip'"
 
 
 

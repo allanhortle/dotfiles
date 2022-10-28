@@ -25,6 +25,7 @@ Plug 'mbbill/undotree'
 Plug 'mhinz/vim-startify'
 Plug 'mzlogin/vim-markdown-toc'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'ruanyl/vim-gh-line'
 Plug 'scrooloose/nerdcommenter'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
@@ -35,6 +36,8 @@ Plug 'tpope/vim-surround'
 Plug 'tweekmonster/startuptime.vim'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'vim-ctrlspace/vim-ctrlspace'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim',
 
 " Neovim
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -170,6 +173,9 @@ let g:ctrlsf_auto_focus = { "at": "start" }
 let g:ctrlsf_populate_qflist = 1
 let g:ctrlsf_extra_backend_args={ 'rg': '-U' }
 let g:coc_node_path = '~/.fnm/aliases/default/bin/node'
+let g:ctrlsf_regex_pattern = 1
+
+
 
 
 "
@@ -250,12 +256,10 @@ nnoremap gj j
 nnoremap gk k
 
 nnoremap Y y$
-nnoremap <Leader><Leader> :Buffers<CR>
+nnoremap <Leader><Leader> :Telescope buffers<CR>
 nnoremap <Space> .
 nnoremap <MiddleMouse> :call CocAction('doHover')<CR>
-nnoremap <C-p> :Files<CR>
-nnoremap <expr> <C-p> (expand('%') =~ 'NERD_tree' ? ":NERDTreeToggle\<CR>" : '').":Files\<cr>"
-"nnoremap <C-f> <Plug>CtrlSFPrompt
+nnoremap <C-p> :Telescope find_files<CR>
 nnoremap <C-f> :CtrlSF 
 nnoremap <CR> :noh<CR><CR>
 nnoremap <Leader>h :Startify<CR>
@@ -270,13 +274,13 @@ nmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
 " Remap keys for applying codeAction to the current buffer.
 nmap <leader>ac  <Plug>(coc-codeaction)
 " Apply AutoFix to problem on the current line.
-nmap <leader>qf  <Plug>(coc-fix-current)
+"nmap <leader>qf  <Plug>(coc-fix-current)
 
 " Run the Code Lens action on the current line.
 nmap <leader>cl  <Plug>(coc-codelens-action)
 
 nnoremap <Leader>f :bn<CR>
-nnoremap <Leader>t :TSHighlightCapturesUnderCursor<CR>
+nnoremap <Leader>w :TSHighlightCapturesUnderCursor<CR>
 nnoremap <Leader>q :bp \|bw #<CR>
 nnoremap <Leader>s :Startify<CR>
 nnoremap <Leader>r :source $MYVIMRC<CR>
@@ -319,6 +323,7 @@ command! -bang WQ wq<bang>
 command! -bang Wqa wqa<bang>
 command! -bang WQa wqa<bang>
 command! -bang WQA wqa<bang>
+command! Work :vsplit ~/Dropbox/work.md
 
 " nops
 nnoremap <Up> <nop>

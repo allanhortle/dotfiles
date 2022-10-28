@@ -14,7 +14,7 @@
     "formats": {
       "title": {
         "title": ["%{title}%{artist| - %{artist}|}", "", ""],
-        "subtitle": ["%{key|%{}  }%{time|%{}  }", "", ""]
+        "subtitle": ["%{key|%{} %{capo|(Capo %{})  } }%{time|%{}  }", "", ""]
       }
     },
     "margintop": 96,
