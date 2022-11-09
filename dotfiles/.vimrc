@@ -173,7 +173,7 @@ let g:ctrlsf_auto_focus = { "at": "start" }
 let g:ctrlsf_populate_qflist = 1
 let g:ctrlsf_extra_backend_args={ 'rg': '-U' }
 let g:coc_node_path = '~/.fnm/aliases/default/bin/node'
-let g:ctrlsf_regex_pattern = 1
+"let g:ctrlsf_regex_pattern = 1
 
 
 
@@ -248,6 +248,8 @@ map <F6> :setlocal spell! spelllang=en_au<CR>
 map <F7> :Goyo<CR>
 map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
+" uuid
+inoremap <C-u> <C-r>=system('uuidgen')[:-2]<CR><Esc>
 
 " Wrapped navigation
 nnoremap j gj
@@ -272,7 +274,7 @@ xmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
 nmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
 
 " Remap keys for applying codeAction to the current buffer.
-nmap <leader>ac  <Plug>(coc-codeaction)
+"nmap <leader>ac  <Plug>(coc-codeaction)
 " Apply AutoFix to problem on the current line.
 "nmap <leader>qf  <Plug>(coc-fix-current)
 
@@ -304,6 +306,10 @@ let g:tig_explorer_use_builtin_term=0
 
 " windows
 nnoremap <Leader><Tab> <C-W>w
+
+" center on search
+nnoremap n nzzzv
+nnoremap N Nzzzv
 
 " window/buffer splitting
 nnoremap <leader>s<left>   :leftabove  vnew<CR>

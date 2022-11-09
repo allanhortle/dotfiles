@@ -5,6 +5,13 @@ if exists("syntax_on")
 endif
 let g:colors_name = "ts-colors"
 
+hi typescriptTypeBrackets ctermfg=magenta cterm=NONE
+hi def link @variable Yellow
+hi! def link typescriptIdentifierName Yellow
+
+hi Magenta ctermfg=magenta cterm=NONE
+hi typescriptIdentifierName ctermfg=yellow cterm=NONE
+
 
 " Reset
 hi Normal cterm=NONE ctermfg=white ctermbg=NONE
@@ -20,6 +27,7 @@ hi @operator ctermfg=white cterm=NONE
 " Defaults
 hi Constant ctermfg=green cterm=NONE
 hi Statement ctermfg=red cterm=NONE
+
 
 
 
@@ -46,7 +54,6 @@ hi @variable.builtin ctermfg=red cterm=NONE
 hi @variable ctermfg=white cterm=NONE
 hi @comment ctermfg=242 cterm=NONE
 
-hi typescriptTypeBrackets ctermfg=magenta cterm=NONE
 
 " Tree Sitter Overrides
 hi tmuxCommands ctermfg=red cterm=NONE

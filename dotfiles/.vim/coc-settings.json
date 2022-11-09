@@ -15,6 +15,9 @@
   "snippets.loadFromExtensions": false,
   "explorer.file.showHiddenFiles": true,
   "explorer.quitOnOpen": true,
+  "explorer.keyMappings.global": {
+    "<c-v>": "open:vsplit"
+  },
   "javascript.validate.enable": false,
   "prettier.bracketSpacing": false,
   "prettier.printWidth": 100,

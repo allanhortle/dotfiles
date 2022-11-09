@@ -1,3 +1,4 @@
+;; extends
 ; keywords
 
 [
@@ -21,6 +22,7 @@
     "?"
     ":"
 ] @Nothing
+(ternary_expression ["?" ":"] @conditional (#set! "priority" 205))
 
 
 ; Builtin Objects

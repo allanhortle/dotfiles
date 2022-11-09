@@ -1,3 +1,4 @@
+;; extends
 ; Keywords
 [
     "as"
@@ -32,7 +33,7 @@
     (type_annotation) 
     (type_alias_declaration)
     (type_parameters) 
-] @foo (#set! "priority" 200)
+] @type (#set! "priority" 200)
 
 ;(type_alias_declaration (identifier) @tag)
 (type_alias_declaration value: (_) @type (#set! "priority" 205)) @type
