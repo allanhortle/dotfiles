@@ -1,3 +1,4 @@
+
 "
 " Plugins
 "
@@ -8,22 +9,23 @@ if empty(glob('~/.vim/autoload/plug.vim'))
     autocmd VimEnter * PlugInstall | source $MYVIMRC
 endif
 call plug#begin('~/.vim/plugged')
+
 Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'beloglazov/vim-online-thesaurus'
-Plug 'benmills/vimux'
 Plug 'dhruvasagar/vim-zoom'
 Plug 'docunext/closetag.vim'
 Plug 'dyng/ctrlsf.vim'
+Plug 'editorconfig/editorconfig-vim'
 Plug 'iberianpig/tig-explorer.vim'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' } 
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/vim-peekaboo'
 Plug 'jxnblk/vim-mdx-js'
 Plug 'mattn/emmet-vim'
 Plug 'mbbill/undotree'
 Plug 'mhinz/vim-startify'
-Plug 'mzlogin/vim-markdown-toc'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'ruanyl/vim-gh-line'
 Plug 'scrooloose/nerdcommenter'
@@ -33,14 +35,12 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-markdown'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
+Plug 'tpope/vim-dadbod'
 Plug 'tweekmonster/startuptime.vim'
-Plug 'editorconfig/editorconfig-vim'
-Plug 'vim-ctrlspace/vim-ctrlspace'
-Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim',
 
 " Neovim
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/nvim-treesitter-context'
 Plug 'nvim-treesitter/playground'
 Plug 'David-Kunz/treesitter-unit'
 call plug#end() 
@@ -56,6 +56,7 @@ set backupcopy=auto             " use rename-and-write-new method whenever safe
 set colorcolumn=120
 set complete=.,w,b,u,i          " turn off tab completion for tags
 set copyindent                  " copy the previous indentation on auto-indenting
+set cmdwinheight=32             " height of the command history window 
 set encoding=utf8
 set expandtab
 set fillchars=vert:\            " set empty vert chartacter
@@ -153,10 +154,21 @@ endfunction
 autocmd! User GoyoEnter call <SID>goyo_enter()
 autocmd! User GoyoLeave call <SID>goyo_leave()
 
-" FZF
+" fzf
 let g:fzf_preview_window = ''
-let g:fzf_layout = { 'up': '50%' }
+let g:fzf_layout = { 'window': { 'width': 0.5, 'height': 0.5 } }
+let g:fzf_colors = {
+    \ 'border': ['fg', 'Normal'],
+    \ 'info': ['fg', 'Normal'],
+    \ 'prompt': ['fg', '@comment'],
+    \ 'marker': ['fg', 'Normal'],
+    \ 'header': ['fg', '@comment'],
+    \}
 command! -bang -nargs=? -complete=dir Files call fzf#vim#files(<q-args>, {'options': ['-i']}, <bang>0)
+function! s:fzf_statusline()
+  setlocal statusline=%#Normal#
+endfunction
+autocmd! User FzfStatusLine call <SID>fzf_statusline()
 
 
 " Startify
@@ -184,14 +196,20 @@ let g:coc_node_path = '~/.fnm/aliases/default/bin/node'
 
 " Extensions
 let g:coc_global_extensions = [
-    \ 'coc-tsserver',
-    \ 'coc-json',
+    \ 'coc-dictionary',
+    \ 'coc-eslint',
     \ 'coc-explorer',
+    \ 'coc-json',
     \ 'coc-lua',
+    \ 'coc-prettier',
+    \ 'coc-prisma',
+    \ 'coc-pyright',
+    \ 'coc-snippets',
+    \ 'coc-tsserver',
     \ 'coc-vimlsp',
-    \ 'coc-styled-components',
-    \ 'coc-snippets'
+    \ 'coc-word'
 \ ]
+"\ 'coc-styled-components',
 
 if isdirectory('./node_modules') && isdirectory('./node_modules/prettier')
     let g:coc_global_extensions += ['coc-prettier']
@@ -249,7 +267,10 @@ map <F7> :Goyo<CR>
 map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
 " uuid
-inoremap <C-u> <C-r>=system('uuidgen')[:-2]<CR><Esc>
+inoremap <C-u> <C-r>=system('uuidgen \| tr "[:upper:]" "[:lower:]"')[:-2]<CR><Esc>
+
+
+
 
 " Wrapped navigation
 nnoremap j gj
@@ -258,15 +279,11 @@ nnoremap gj j
 nnoremap gk k
 
 nnoremap Y y$
-nnoremap <Leader><Leader> :Telescope buffers<CR>
 nnoremap <Space> .
 nnoremap <MiddleMouse> :call CocAction('doHover')<CR>
-nnoremap <C-p> :Telescope find_files<CR>
+nnoremap <C-p> :Files<CR>
 nnoremap <C-f> :CtrlSF 
 nnoremap <CR> :noh<CR><CR>
-nnoremap <Leader>h :Startify<CR>
-nnoremap <Leader>b :bp<CR>
-nnoremap <Leader>e :CocList --normal -A diagnostics<CR>
 
 " Applying codeAction to the selected region.
 " Example: `<leader>aap` for current paragraph
@@ -281,16 +298,20 @@ nmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
 " Run the Code Lens action on the current line.
 nmap <leader>cl  <Plug>(coc-codelens-action)
 
-nnoremap <Leader>f :bn<CR>
-nnoremap <Leader>w :TSHighlightCapturesUnderCursor<CR>
-nnoremap <Leader>q :bp \|bw #<CR>
-nnoremap <Leader>s :Startify<CR>
-nnoremap <Leader>r :source $MYVIMRC<CR>
-nnoremap <Leader>v :e $MYVIMRC<CR>
-nnoremap <Leader>u :UndotreeToggle<CR>
+nnoremap <Leader><Leader> :Buffers<CR>
+nnoremap <Leader>b :bp<CR>
 nnoremap <Leader>d1 :diffget LOCAL<CR>
 nnoremap <Leader>d2 :diffget BASE<CR>
 nnoremap <Leader>d3 :diffget REMOTE<CR>
+nnoremap <Leader>e :CocList --normal -A diagnostics<CR>
+nnoremap <Leader>f :bn<CR>
+nnoremap <Leader>h :History<CR>
+nnoremap <Leader>q :bp \|bw #<CR>
+nnoremap <Leader>r :source $MYVIMRC<CR>
+nnoremap <Leader>s :Startify<CR>
+nnoremap <Leader>u :UndotreeToggle<CR>
+nnoremap <Leader>v :e $MYVIMRC<CR>
+nnoremap <Leader>w :TSHighlightCapturesUnderCursor<CR>
 
 nnoremap Q @@
 vnoremap Y "*y
@@ -311,12 +332,6 @@ nnoremap <Leader><Tab> <C-W>w
 nnoremap n nzzzv
 nnoremap N Nzzzv
 
-" window/buffer splitting
-nnoremap <leader>s<left>   :leftabove  vnew<CR>
-nnoremap <leader>s<right>  :rightbelow vnew<CR>
-nnoremap <leader>s<up>     :leftabove  new<CR>
-nnoremap <leader>s<down>   :rightbelow new<CR>
-
 " Commands
 command! -bang Q q<bang>
 command! -bang Qa qa<bang>
@@ -330,6 +345,7 @@ command! -bang Wqa wqa<bang>
 command! -bang WQa wqa<bang>
 command! -bang WQA wqa<bang>
 command! Work :vsplit ~/Dropbox/work.md
+command! Scratch :vsplit ~/.scratch.txt
 
 " nops
 nnoremap <Up> <nop>

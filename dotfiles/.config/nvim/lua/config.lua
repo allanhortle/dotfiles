@@ -3,30 +3,7 @@ require('nvim-treesitter.configs').setup {
     ignore_install = { "php", "phpdoc" },
     highlight = {
         enable = true,
-        additional_vim_regex_highlighting = false
+        additional_vim_regex_highlighting = true
     }
 }
-
-local actions = require('telescope.actions');
-require('telescope').setup({
-    defaults = {
-        prompt_prefix = " ",
-        mappings = {
-            i = {
-                ["<esc>"] = actions.close,
-            },
-        }
-    },
-    pickers = {
-        buffers = {
-            theme = 'dropdown',
-            previewer = false,
-        },
-        find_files = {
-            find_command = {"rg","--ignore","--hidden","--files", "--glob", "!.git"},
-            theme = 'dropdown',
-            previewer = false,
-        }
-    }
-})
 

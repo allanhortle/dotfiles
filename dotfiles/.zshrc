@@ -158,6 +158,7 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git"'
 export FZF_DEFAULT_OPTS='--color=16,bg+:-1,pointer:2,prompt:2,hl+:2,hl:2,fg+:2'
 export EDITOR="/opt/homebrew/bin/nvim"
 export HOMEBREW_NO_INSTALL_UPGRADE=1
+export DOCKER_HOST="unix://$HOME/.colima/docker.sock"
 
 
 #
@@ -194,7 +195,7 @@ function z() {
 }
 
 function root() {
-    cd ...
+    cd ../../
     "$@"
     cd - 
 }
@@ -222,7 +223,7 @@ function layout() {
     repeat make {tmux split-window}; 
     # do the layout
     tmux select-layout main-vertical
-    tmux resize-pane -t 1 -x 180
+    tmux resize-pane -t 1 -x 123
     tmux select-pane -t 1
 }
 
@@ -237,6 +238,7 @@ alias ga='git add -A :/'
 alias gc='git commit'
 alias gco='git checkout'
 alias gf='git fetch --all -p'
+                                                                                                                     
 alias gl='git pull'
 alias gp='git push'
 alias grb='git rebase'
