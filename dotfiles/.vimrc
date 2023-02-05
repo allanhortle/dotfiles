@@ -17,6 +17,7 @@ Plug 'dhruvasagar/vim-zoom'
 Plug 'docunext/closetag.vim'
 Plug 'dyng/ctrlsf.vim'
 Plug 'editorconfig/editorconfig-vim'
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
 Plug 'iberianpig/tig-explorer.vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
@@ -37,6 +38,8 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-dadbod'
 Plug 'tweekmonster/startuptime.vim'
+
+Plug 'liuchengxu/vista.vim'
 
 " Neovim
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -112,7 +115,7 @@ let &t_SI = "\033[5 q" " INSERT  |
 let &t_SR = "\033[3 q" " REPLACE _
 
 " plain text type file options
-augroup WritingFiles
+augroup PlainTextFiles
     autocmd!
     autocmd FileType markdown set wrap
     autocmd FileType markdown setlocal spell
@@ -185,8 +188,12 @@ let g:ctrlsf_auto_focus = { "at": "start" }
 let g:ctrlsf_populate_qflist = 1
 let g:ctrlsf_extra_backend_args={ 'rg': '-U' }
 let g:coc_node_path = '~/.fnm/aliases/default/bin/node'
-"let g:ctrlsf_regex_pattern = 1
 
+
+" vista
+let g:vista_icon_indent = ["▸ ", ""]
+let g:vista#renderer#enable_icon = 0
+let g:vista_default_executive = 'coc'
 
 
 
@@ -232,10 +239,8 @@ inoremap <silent><expr> <TAB>
       \ coc#refresh()
 inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
-"" accept on enter
+" accept on enter
 inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
-
-
 
 " Coc Mappings
 nmap <silent> gd <Plug>(coc-definition)
@@ -246,10 +251,17 @@ nmap <leader>rn <Plug>(coc-rename)
 nnoremap <silent> K :call CocAction('doHover')<CR>
 nnoremap <C-O> :CocCommand explorer<CR>
 nnoremap <C-L> :execute 'CocCommand explorer ' . expand('%:h')<CR>
+" Applying codeAction to the selected region.
+" Example: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
+nmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
+" Run the Code Lens action on the current line.
+nmap <leader>cl  <Plug>(coc-codelens-action)
 
 
 "
 " units
+"
 xnoremap iu :lua require"treesitter-unit".select()<CR>
 xnoremap au :lua require"treesitter-unit".select(true)<CR>
 onoremap iu :<c-u>lua require"treesitter-unit".select()<CR>
@@ -265,12 +277,19 @@ map <F3> :set wrap!<CR>:set linebreak!<CR>
 map <F6> :setlocal spell! spelllang=en_au<CR>
 map <F7> :Goyo<CR>
 map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+nnoremap Y y$
+nnoremap <Space> .
+nnoremap <MiddleMouse> :call CocAction('doHover')<CR>
+nnoremap <C-p> :Files<CR>
+nnoremap <C-f> :CtrlSF 
+nnoremap <CR> :noh<CR><CR>
+nnoremap Q @@
+vnoremap Y "*y
+nnoremap + <C-a>
+nnoremap - <C-x>
 
 " uuid
 inoremap <C-u> <C-r>=system('uuidgen \| tr "[:upper:]" "[:lower:]"')[:-2]<CR><Esc>
-
-
-
 
 " Wrapped navigation
 nnoremap j gj
@@ -278,26 +297,7 @@ nnoremap k gk
 nnoremap gj j
 nnoremap gk k
 
-nnoremap Y y$
-nnoremap <Space> .
-nnoremap <MiddleMouse> :call CocAction('doHover')<CR>
-nnoremap <C-p> :Files<CR>
-nnoremap <C-f> :CtrlSF 
-nnoremap <CR> :noh<CR><CR>
-
-" Applying codeAction to the selected region.
-" Example: `<leader>aap` for current paragraph
-xmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
-nmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
-
-" Remap keys for applying codeAction to the current buffer.
-"nmap <leader>ac  <Plug>(coc-codeaction)
-" Apply AutoFix to problem on the current line.
-"nmap <leader>qf  <Plug>(coc-fix-current)
-
-" Run the Code Lens action on the current line.
-nmap <leader>cl  <Plug>(coc-codelens-action)
-
+" leaders
 nnoremap <Leader><Leader> :Buffers<CR>
 nnoremap <Leader>b :bp<CR>
 nnoremap <Leader>d1 :diffget LOCAL<CR>
@@ -312,11 +312,6 @@ nnoremap <Leader>s :Startify<CR>
 nnoremap <Leader>u :UndotreeToggle<CR>
 nnoremap <Leader>v :e $MYVIMRC<CR>
 nnoremap <Leader>w :TSHighlightCapturesUnderCursor<CR>
-
-nnoremap Q @@
-vnoremap Y "*y
-nnoremap + <C-a>
-nnoremap - <C-x>
 
 " tig
 nnoremap <Leader>tt :Tig<CR>
@@ -392,6 +387,19 @@ hi ErrorColor ctermbg=red ctermfg=black
 hi VisualColor ctermbg=magenta ctermfg=black
 hi InactiveColor ctermbg=grey ctermfg=black
 
+function! CocStatusline() abort
+    let info = get(b:, 'coc_diagnostic_info', {})
+    if empty(info) | return '' | endif
+    let msgs = []
+    if get(info, 'error', 0)
+    call add(msgs, 'E' . info['error'])
+    endif
+    if get(info, 'warning', 0)
+    call add(msgs, 'W' . info['warning'])
+    endif
+    return join(msgs, ' ') . ' ' . get(g:, 'coc_status', '')
+endfunction
+
 function! StatusLine() abort
     let l:modes = {
         \ 'n'      : 'normal',
@@ -437,6 +445,9 @@ function! StatusLine() abort
     let l:errortext = ""
     if len(msgs) | let l:errortext = "  " . join(l:msgs, ",") | endif
 
+    let l:status = trim(get(g:, 'coc_status', ''))
+    let l:status = substitute(l:status, "Initializing tsserver", "TSC", "")
+
     " Choose color
     "if l:error && l:currentmode ==? 'normal'
         "let l:color = "%#ErrorColor#" 
@@ -452,7 +463,8 @@ function! StatusLine() abort
 
     "let statusline.= l:errortext
     let statusline.="%="
-    let statusline.="%r%w%y" "read only, preview, filetype
+    let statusline.=""..l:errortext .. " " .. l:status
+    let statusline.=" %r%w%y" "read only, preview, filetype
     let statusline.=" %v:%l/%L "
     return statusline
 
