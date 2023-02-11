@@ -32,5 +32,6 @@
   "typescript.autoClosingTags": false,
   "workspace.bottomUpFiletypes": ["typescriptreact", "typescript"],
   "python.formatting.provider": "black",
-  "python.formatting.blackPath": "/opt/homebrew/bin/black"
+  "python.formatting.blackPath": "/opt/homebrew/bin/black",
+  "snippets.ultisnips.pythonPrompt": false
 }
