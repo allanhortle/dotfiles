@@ -11,6 +11,7 @@ endif
 call plug#begin('~/.vim/plugged')
 
 Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim'
+Plug 'adelarsq/vim-matchit'
 Plug 'airblade/vim-gitgutter'
 Plug 'beloglazov/vim-online-thesaurus'
 Plug 'dhruvasagar/vim-zoom'
@@ -24,6 +25,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/vim-peekaboo'
 Plug 'jxnblk/vim-mdx-js'
+Plug 'liuchengxu/vista.vim'
 Plug 'mattn/emmet-vim'
 Plug 'mbbill/undotree'
 Plug 'mhinz/vim-startify'
@@ -38,12 +40,10 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-dadbod'
 Plug 'tweekmonster/startuptime.vim'
-
-Plug 'liuchengxu/vista.vim'
+Plug 'wfxr/minimap.vim'
 
 " Neovim
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-Plug 'nvim-treesitter/nvim-treesitter-context'
 Plug 'nvim-treesitter/playground'
 Plug 'David-Kunz/treesitter-unit'
 call plug#end() 
@@ -159,7 +159,7 @@ autocmd! User GoyoLeave call <SID>goyo_leave()
 
 " fzf
 let g:fzf_preview_window = ''
-let g:fzf_layout = { 'window': { 'width': 0.5, 'height': 0.5 } }
+let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.5 } }
 let g:fzf_colors = {
     \ 'border': ['fg', 'Normal'],
     \ 'info': ['fg', 'Normal'],
@@ -191,9 +191,16 @@ let g:coc_node_path = '~/.fnm/aliases/default/bin/node'
 
 
 " vista
-let g:vista_icon_indent = ["▸ ", ""]
+"let g:vista_icon_indent = ["▸ ", ""]
 let g:vista#renderer#enable_icon = 0
 let g:vista_default_executive = 'coc'
+let g:vista_sidebar_width = '50'
+let g:vista_close_on_jump = 1
+let g:vista_ignore_kinds = ['Property', 'Variable']
+let g:vista#renderer#icons = {
+\   "function": "F",
+\   "variable": "V",
+\  }
 
 
 
@@ -274,7 +281,7 @@ onoremap au :<c-u>lua require"treesitter-unit".select(true)<CR>
 nmap <F1> :echo expand('%:p')<cr>
 set pastetoggle=<F2>
 map <F3> :set wrap!<CR>:set linebreak!<CR>
-map <F6> :setlocal spell! spelllang=en_au<CR>
+map <F6> :setlocal spell! sp}),elllang=en_au<CR>
 map <F7> :Goyo<CR>
 map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 nnoremap Y y$
@@ -287,6 +294,9 @@ nnoremap Q @@
 vnoremap Y "*y
 nnoremap + <C-a>
 nnoremap - <C-x>
+
+nnoremap <C-j> 1g;
+nnoremap <C-k> 1g,
 
 " uuid
 inoremap <C-u> <C-r>=system('uuidgen \| tr "[:upper:]" "[:lower:]"')[:-2]<CR><Esc>
@@ -304,6 +314,7 @@ nnoremap <Leader>d1 :diffget LOCAL<CR>
 nnoremap <Leader>d2 :diffget BASE<CR>
 nnoremap <Leader>d3 :diffget REMOTE<CR>
 nnoremap <Leader>e :CocList --normal -A diagnostics<CR>
+nnoremap <Leader>o :Vista!!<CR>
 nnoremap <Leader>f :bn<CR>
 nnoremap <Leader>h :History<CR>
 nnoremap <Leader>q :bp \|bw #<CR>
@@ -322,6 +333,7 @@ let g:tig_explorer_use_builtin_term=0
 
 " windows
 nnoremap <Leader><Tab> <C-W>w
+nnoremap <C-w>z <Plug>(zoom-toggle)
 
 " center on search
 nnoremap n nzzzv

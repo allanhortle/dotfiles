@@ -6,14 +6,16 @@ brew install fnm
 brew install fzf
 brew install git
 brew install htop
-brew install node
 brew install neovim
+brew install node
+brew install qlmarkdown
+brew install qlstephen
 brew install ripgrep
+brew install saulpw/vd/visidata
 brew install stow
 brew install tig
 brew install tmux
 brew install vim
-brew install saulpw/vd/visidata
 brew install yarn
 
 brew cleanup

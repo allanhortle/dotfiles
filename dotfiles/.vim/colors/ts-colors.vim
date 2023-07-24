@@ -52,6 +52,7 @@ hi def link @type.builtin @type
 "hi def link @text.title @type
 
 
+
 " Tree Sitter Overrides
 hi tmuxCommands ctermfg=red cterm=NONE
 hi tmuxString ctermfg=green cterm=NONE
@@ -64,7 +65,10 @@ hi ErrorMsg ctermfg=red ctermbg=black
 hi FoldColumn ctermbg=NONE ctermfg=1
 hi Folded ctermbg=NONE ctermfg=242
 hi LineNr ctermfg=242
-hi MatchParen ctermfg=white ctermbg=grey
+hi MatchParen ctermbg=NONE ctermfg=NONE cterm=underline
+hi CocUnderline cterm=undercurl
+hi CocErrorHighlight cterm=undercurl
+hi CocWarningHighlight cterm=undercurl
 hi ModeMsg ctermfg=white
 hi MoreMsg ctermfg=white
 hi NonText ctermfg=242
@@ -74,7 +78,7 @@ hi Question ctermfg=white
 hi Search ctermbg=grey
 hi SignColumn ctermbg=NONE
 hi SpecialKey ctermfg=white
-hi SpellBad ctermfg=red ctermbg=NONE cterm=underline
+hi SpellBad ctermfg=red ctermbg=NONE cterm=undercurl
 hi SpellCap ctermfg=yellow ctermbg=NONE cterm=underline
 hi SpellLocal ctermfg=NONE ctermbg=NONE cterm=NONE
 hi TabLine ctermfg=NONE ctermbg=NONE cterm=NONE
@@ -123,8 +127,10 @@ hi markdownCode ctermfg=red
 hi markdownCodeDelimiter ctermfg=242
 hi markdownCodeBlock ctermfg=242
 hi markdownH1 ctermfg=yellow
+hi @text.title ctermfg=yellow
 hi markdownH1Delimiter ctermfg=yellow
 hi markdownH2 ctermfg=green
+hi @text.titleH2 ctermfg=green
 hi markdownH2Delimiter ctermfg=green
 hi markdownH3 ctermfg=blue
 hi markdownH3Delimiter ctermfg=blue

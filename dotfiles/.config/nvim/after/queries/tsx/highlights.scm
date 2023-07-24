@@ -6,8 +6,8 @@
 (jsx_opening_element name: (_) @tag)
 (jsx_self_closing_element name: (_) @tag)
 (jsx_self_closing_element ["<" ">" "/"] @tag)
-(jsx_fragment ["<" ">" "/"] @tag (#set! "priority" 1000))
 ((jsx_closing_element (identifier) @tag (#set! "priority" 207)))
+
 
 
 

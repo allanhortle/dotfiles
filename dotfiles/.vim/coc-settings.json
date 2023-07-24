@@ -8,7 +8,7 @@
     "python",
     "go"
   ],
-  "coc.preferences.rootPatterns": ["package.json", ".git"],
+  "workspace.rootPatterns": ["package.json", ".git"],
   "coc.source.dictionary.filetypes": ["markdown"],
   "coc.source.word.filetypes": ["markdown"],
   "snippets.priority": 1,
@@ -33,5 +33,8 @@
   "workspace.bottomUpFiletypes": ["typescriptreact", "typescript"],
   "python.formatting.provider": "black",
   "python.formatting.blackPath": "/opt/homebrew/bin/black",
-  "snippets.ultisnips.pythonPrompt": false
+  "snippets.ultisnips.pythonPrompt": false,
+  "hover.floatConfig": {
+    "maxWidth": 200
+  }
 }
