@@ -21,13 +21,13 @@ font:
   glyph_offset:
     y: 1
   normal:
-    family: Menlo
+    family: CommitMono
     style: Regular
   bold:
-    family: Menlo
+    family: CommitMono
     style: Bold
   italic:
-    family: Menlo
+    family: CommitMono
     style: Italic
 
 

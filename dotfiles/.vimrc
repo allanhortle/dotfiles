@@ -34,11 +34,11 @@ Plug 'ruanyl/vim-gh-line'
 Plug 'scrooloose/nerdcommenter'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-dadbod'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-markdown'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
-Plug 'tpope/vim-dadbod'
 Plug 'tweekmonster/startuptime.vim'
 Plug 'wfxr/minimap.vim'
 
@@ -263,6 +263,8 @@ nnoremap <C-L> :execute 'CocCommand explorer ' . expand('%:h')<CR>
 xmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
 nmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
 " Run the Code Lens action on the current line.
+xmap <leader>x  <Plug>(coc-convert-snippet)
+vmap <C-j> <Plug>(coc-snippets-select)
 nmap <leader>cl  <Plug>(coc-codelens-action)
 
 
