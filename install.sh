@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 brew update
 
-brew install fasd
+brew insatll gh
 brew install fnm
 brew install fzf
 brew install git
@@ -17,6 +17,7 @@ brew install tig
 brew install tmux
 brew install vim
 brew install yarn
+brew install zoxide
 
 brew cleanup
 

@@ -151,7 +151,7 @@ function precmd() {
 # Environment
 # 
 
-eval "$(fasd --init auto)"
+eval "$(zoxide init zsh)"
 eval "$(fnm env --fnm-dir=$HOME/.fnm --use-on-cd)"
 export CLICOLOR=1
 export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git"'
@@ -185,13 +185,6 @@ function any() {
 
 function weather() {
     bom hobart -p "%t°C"
-}
-
-unalias z 2> /dev/null
-function z() {
-  [ $# -gt 0  ] && fasd_cd -d "$*" && return
-    cd "$(fasd_cd -d 2>&1 | fzf --height 40% --reverse --inline-info +s --tac --query "$*" | sed 's/^[0-9,.]* *//')"
-
 }
 
 function root() {
@@ -255,26 +248,12 @@ function git_fixup() {
     git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup | git rebase -i --autosquash $1
 }
 
-function pr-checkout() {
-  local pr_number
-
-  pr_number=$(
-    gh api 'repos/:owner/:repo/pulls' |
-    jq --raw-output '.[] | "#\(.number) \(.title)"' |
-    fzf |
-    sed 's/^#\([0-9]\+\).*/\1/'
-  )
-
-  if [ -n "$pr_number" ]; then
-    gh pr checkout "$pr_number"
-  fi
-}
-
 # Github
 alias prs="gh pr status"
 alias prc="gh pr create"
 alias prl="gh pr list"
 alias changes="gh pr diff | delta -s"
+alias checks="gh checks --watch"
 
 # data
 alias music="vd --quitguard ~/Dropbox/data/albums.csv"
@@ -320,9 +299,6 @@ alias -- -='cd -'
 alias ...="../.."
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 
-# yarn
-alias yta="yarn test:all"
-
 
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -334,25 +310,9 @@ fi
 
 
 
-# bun completions
+# bun 
 [ -s "/Users/allanhortle/.bun/_bun" ] && source "/Users/allanhortle/.bun/_bun"
-
-# bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/allanhortle/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/Users/allanhortle/miniforge3/etc/profile.d/conda.sh" ]; then
-        . "/Users/allanhortle/miniforge3/etc/profile.d/conda.sh"
-    else
-        export PATH="/Users/allanhortle/miniforge3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
 
