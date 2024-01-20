@@ -193,6 +193,10 @@ function root() {
     cd - 
 }
 
+function battery() {
+    pmset -g batt | grep -o "[0-9]\{1,3\}%"
+}
+
 
 #
 # Tmux

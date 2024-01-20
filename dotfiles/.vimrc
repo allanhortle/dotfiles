@@ -40,6 +40,7 @@ Plug 'tpope/vim-markdown'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tweekmonster/startuptime.vim'
+Plug 'habamax/vim-godot'
 
 " Neovim
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
