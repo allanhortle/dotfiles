@@ -256,7 +256,7 @@ nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 nmap <leader>rn <Plug>(coc-rename)
 nnoremap <silent> K :call CocAction('doHover')<CR>
-nnoremap <C-O> :CocCommand explorer<CR>
+nnoremap <C-o> :CocCommand explorer<CR>
 nnoremap <C-L> :execute 'CocCommand explorer ' . expand('%:h')<CR>
 " Applying codeAction to the selected region.
 " Example: `<leader>aap` for current paragraph

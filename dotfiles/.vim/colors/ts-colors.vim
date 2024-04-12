@@ -48,6 +48,7 @@ hi def link @tag.attribute @tag
 hi def link @label @tag
 
 hi def link @type.builtin @type
+hi def link @property @tag
 
 "hi def link @text.title @type
 
