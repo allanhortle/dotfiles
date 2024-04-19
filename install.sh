@@ -1,9 +1,10 @@
 #!/usr/bin/env zsh
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+eval $(/opt/homebrew/bin/brew shellenv)
 
 brew update
 
-brew insatll gh
+brew install gh
 brew install fnm
 brew install fzf
 brew install git
@@ -23,6 +24,9 @@ brew install zoxide
 
 brew cleanup
 
+stow dotfiles --no-folding
+
+source ~/.zshrc
 
 # Python rubbish for nvim snippets
 pip3 install pynvim
