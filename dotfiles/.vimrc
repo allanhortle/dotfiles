@@ -41,6 +41,8 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tweekmonster/startuptime.vim'
 Plug 'habamax/vim-godot'
+Plug 'wfxr/minimap.vim'
+Plug 'arthurxavierx/vim-caser'
 
 " Neovim
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -186,7 +188,7 @@ let g:startify_lists = [
 " ctrlsf
 let g:ctrlsf_auto_focus = { "at": "start" }
 let g:ctrlsf_populate_qflist = 1
-let g:ctrlsf_extra_backend_args={ 'rg': '-U' }
+let g:ctrlsf_extra_backend_args={ 'rg': '-U --ignore-file "*.lock"' }
 let g:coc_node_path = '~/.fnm/aliases/default/bin/node'
 
 
@@ -224,6 +226,7 @@ let g:coc_global_extensions = [
     \ 'coc-word'
 \ ]
 "\ 'coc-styled-components',
+let g:coc_node_args = ['--max-old-space-size=8192']
 
 if isdirectory('./node_modules') && isdirectory('./node_modules/prettier')
     let g:coc_global_extensions += ['coc-prettier']
@@ -283,7 +286,7 @@ onoremap au :<c-u>lua require"treesitter-unit".select(true)<CR>
 nmap <F1> :echo expand('%:p')<cr>
 set pastetoggle=<F2>
 map <F3> :set wrap!<CR>:set linebreak!<CR>
-map <F6> :setlocal spell! sp}),elllang=en_au<CR>
+map <F6> :setlocal spell! spelllang=en_au<CR>
 map <F7> :Goyo<CR>
 map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<' . synIDattr(synID(line("."),col("."),0),"name") . "> lo<" . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 nnoremap Y y$

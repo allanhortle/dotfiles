@@ -1,47 +1,34 @@
 {
-    "coc.preferences.formatOnSaveFiletypes": [
-        "javascript",
-        "typescript",
-        "typescriptreact",
-        "json",
-        "graphql",
-        "python",
-        "go"
-    ],
-    "workspace.rootPatterns": ["package.json", ".git"],
-    "coc.source.dictionary.filetypes": ["markdown"],
-    "coc.source.word.filetypes": ["markdown"],
-    "snippets.priority": 1,
-    "snippets.loadFromExtensions": false,
-    "explorer.file.showHiddenFiles": true,
-    "explorer.quitOnOpen": true,
-    "explorer.keyMappings.global": {
-        "<c-v>": "open:vsplit"
-    },
-    "javascript.validate.enable": false,
-    "prettier.bracketSpacing": false,
-    "prettier.printWidth": 100,
-    "prettier.semi": true,
-    "prettier.singleQuote": true,
-    "prettier.tabWidth": 4,
-    "prettier.trailingComma": "none",
-    "prettier.statusItemText": "",
-    "suggest.noselect": true,
-    "tsserver.log": "verbose",
-    "tsserver.trace.server": "verbose",
-    "typescript.autoClosingTags": false,
-    "workspace.bottomUpFiletypes": ["typescriptreact", "typescript"],
-    "python.formatting.provider": "black",
-    "python.formatting.blackPath": "/opt/homebrew/bin/black",
-    "snippets.ultisnips.pythonPrompt": false,
-    "hover.floatConfig": {
-        "maxWidth": 200
-    },
-    "languageserver": {
-        "godot": {
-            "host": "127.0.0.1",
-            "filetypes": ["gdscript"],
-            "port": 6005
-        }
-    }
+  "coc.preferences.formatOnSaveFiletypes": [
+    "javascript",
+    "typescript",
+    "typescriptreact",
+    "json",
+    "graphql",
+    "python",
+    "go"
+  ],
+  "workspace.rootPatterns": ["package.json", ".git"],
+  "coc.source.dictionary.filetypes": ["markdown"],
+  "coc.source.word.filetypes": ["markdown"],
+  "snippets.priority": 1,
+  "snippets.loadFromExtensions": false,
+  "explorer.file.showHiddenFiles": true,
+  "explorer.quitOnOpen": true,
+  "explorer.keyMappings.global": {
+    "<c-v>": "open:vsplit"
+  },
+  "javascript.validate.enable": false,
+  "suggest.noselect": true,
+  "tsserver.log": "verbose",
+  "tsserver.trace.server": "verbose",
+  "typescript.autoClosingTags": false,
+  "workspace.bottomUpFiletypes": ["typescriptreact", "typescript"],
+  "python.formatting.provider": "black",
+  "python.formatting.blackPath": "/opt/homebrew/bin/black",
+  "snippets.ultisnips.pythonPrompt": false,
+  "hover.floatConfig": {
+    "maxWidth": 200
+  },
+  "tsserver.useLocalTsdk": true
 }

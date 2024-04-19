@@ -3,17 +3,20 @@ if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
 fi
 
-autoload -U compinit
+#autoload -Uz compinit
 autoload -U colors && colors
 autoload -Uz vcs_info
 autoload -U up-line-or-beginning-search
 autoload -U down-line-or-beginning-search
 autoload -z edit-command-line
-compinit -i
+#compinit
 
 # Edit commands
 zle -N edit-command-line
 bindkey "^E" edit-command-line
+
+# Make backspace work after A in vim mode
+bindkey -v '^?' backward-delete-char
 
 # History Search
 zle -N up-line-or-beginning-search
@@ -252,6 +255,26 @@ function git_fixup() {
     git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup | git rebase -i --autosquash $1
 }
 
+alias coverage="open coverage/lcov-report/index.html"
+
+alias check="gh pr checks --watch"
+alias checks="check; saycode"
+
+function pr-checkout() {
+  local pr_number
+
+  pr_number=$(
+    gh api 'repos/:owner/:repo/pulls' |
+    jq --raw-output '.[] | "#\(.number) \(.title)"' |
+    fzf |
+    sed 's/^#\([0-9]\+\).*/\1/'
+  )
+
+  if [ -n "$pr_number" ]; then
+    gh pr checkout "$pr_number"
+  fi
+}
+
 # Github
 alias prs="gh pr status"
 alias prc="gh pr create"
@@ -302,6 +325,15 @@ alias vim='nvim'
 alias -- -='cd -'
 alias ...="../.."
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias pp="pino-pretty --ignore pid,hostname -t HH:MM:ss"
+#alias saycode='say "${pipestatus[1]}"'
+function saycode() {
+    if [ $? -eq 0 ]; then
+        say "success"
+    else
+        say "failure"
+    fi
+}
 
 
 
@@ -320,3 +352,6 @@ export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 
+autoload bashcompinit && bashcompinit
+autoload -Uz compinit && compinit
+complete -C '/opt/homebrew/bin/aws_completer' aws
