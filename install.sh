@@ -3,7 +3,9 @@
 eval $(/opt/homebrew/bin/brew shellenv)
 
 brew bundle 
-brew cleanup
 stow dotfiles --no-folding
 source ~/.zshrc
+
+defaults write "com.apple.dock" "persistent-apps" -array
+killall Dock
 
