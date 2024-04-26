@@ -7,5 +7,14 @@ stow dotfiles --no-folding
 source ~/.zshrc
 
 defaults write "com.apple.dock" "persistent-apps" -array
+
+defaults -currentHost write -g com.apple.swipescrolldirection -bool false
+
+# Remap capslock to control on the default keyboard
+defaults -currentHost write -g com.apple.keyboard.modifiermapping '({                                                                
+    HIDKeyboardModifierMappingDst = 30064771300;
+    HIDKeyboardModifierMappingSrc = 30064771129;
+})'
+
 killall Dock
 
