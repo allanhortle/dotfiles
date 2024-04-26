@@ -1,0 +1,64 @@
+live_config_reload = true
+
+[colors.bright]
+black = "0x686868"
+blue = "0x6871ff"
+cyan = "0xa6fde1"
+green = "0xcbe645"
+magenta = "0xff77ff"
+red = "0xf07178"
+white = "0xffffff"
+yellow = "0xffdf80"
+
+[colors.normal]
+black = "0x1A1F28"
+blue = "0x36a3d9"
+cyan = "0x95e6cb"
+green = "0xbae67e"
+magenta = "0xd4bfff"
+red = "0xf07178"
+white = "0xc7c7c7"
+yellow = "0xffcc66"
+
+[colors.primary]
+background = "0x212733"
+foreground = "0xd9d7ce"
+
+[font]
+size = 14.0
+
+[font.bold]
+family = "CommitMono"
+style = "Bold"
+
+[font.glyph_offset]
+y = 1
+
+[font.italic]
+family = "CommitMono"
+style = "Italic"
+
+[font.normal]
+family = "CommitMono"
+style = "Regular"
+
+[[keyboard.bindings]]
+chars = "\u001E"
+key = "Key6"
+mods = "Control"
+
+[[keyboard.bindings]]
+action = "ToggleFullscreen"
+key = "F11"
+
+[selection]
+save_to_clipboard = true
+semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
+
+[window]
+decorations = "buttonless"
+startup_mode = "SimpleFullscreen"
+
+[window.padding]
+x = 8
+y = 4
