@@ -6,51 +6,74 @@ endif
 let g:colors_name = "ts-colors"
 
 " basics
+"hi def link @type.builtin @type
 hi @none ctermfg=white cterm=NONE
 hi @keyword ctermfg=red cterm=NONE
 hi @constant ctermfg=blue cterm=NONE
 hi @string ctermfg=green cterm=NONE
-hi @comment ctermfg=242 cterm=italic
 hi @type ctermfg=yellow cterm=NONE
+"hi @type ctermfg=yellow cterm=NONE
 hi @tag ctermfg=yellow cterm=NONE
+hi @comment ctermfg=242 cterm=italic
+"hi typescriptIdentifierName ctermfg=red ctermbg=blue cterm=none
 
 " Reset ? Default vim
 hi! def link Comment @comment
 hi Normal cterm=NONE ctermfg=white ctermbg=NONE
 hi Identifier ctermfg=white cterm=NONE
 hi PreProc ctermfg=white cterm=NONE
-hi Type ctermfg=white cterm=NONE
+"hi Type ctermfg=white cterm=NONE
 hi Special ctermfg=white cterm=NONE
 hi Title ctermfg=white cterm=NONE
 hi Constant ctermfg=white cterm=NONE
 hi Statement ctermfg=white cterm=NONE
+hi Function ctermfg=white cterm=NONE
 
 
 " Tree Sitter
 hi def link @preproc @comment
+hi def link @markup.raw @comment
+
+" Nothings
+hi def link @conditional @none
 hi def link @operator @none
 hi def link @variable @none
-hi def link @conditional @keyword
+hi def link @variable.member @none
+hi def link @function @none
+hi def link @variable.tsx @none
+hi def link @function.method.call @none
+hi def link @punctuation.bracket @none
+
+
 hi def link @include @keyword
 hi def link @keyword.function @keyword
 hi def link @keyword.operator @keyword
 hi def link @exception @keyword
 hi def link @repeat @keyword
 hi def link @variable.builtin @keyword
+hi def link @keyword.type.typescript @keyword
 
 hi def link @boolean @constant
 hi def link @constant.builtin @constant
 hi def link @number @constant
+
 hi def link @string @string
 hi def link @string.regex @string
 
 hi def link @tag.attribute @tag
 hi def link @label @tag
-
-hi def link @type.builtin @type
 hi def link @property @tag
+hi def link @tag.builtin.tsx @tag
 
-"hi def link @text.title @type
+" Markdown
+hi def link @label.markdown @comment
+hi def link @markup.heading @tag
+hi def link @markup.heading.2 @string
+hi def link @markup.heading.3 @constant
+hi def link @markup.link @constant
+
+
+
 
 
 
@@ -59,7 +82,7 @@ hi tmuxCommands ctermfg=red cterm=NONE
 hi tmuxString ctermfg=green cterm=NONE
 
 " vim UI
-hi ColorColumn ctermbg=black
+hi ColorColumn ctermfg=white ctermbg=black cterm=NONE
 hi Directory ctermfg=white
 hi Error ctermbg=red ctermfg=black
 hi ErrorMsg ctermfg=red ctermbg=black
@@ -70,11 +93,17 @@ hi MatchParen ctermbg=NONE ctermfg=NONE cterm=underline
 hi CocUnderline cterm=undercurl
 hi CocErrorHighlight cterm=undercurl
 hi CocWarningHighlight cterm=undercurl
+hi CocHintHighlight cterm=none
+hi CocDeprecatedHighlight cterm=strikethrough
 hi ModeMsg ctermfg=white
 hi MoreMsg ctermfg=white
 hi NonText ctermfg=242
-hi PMenu ctermfg=white ctermbg=234
-hi PMenuSel ctermfg=black ctermbg=green
+
+hi Pmenu ctermfg=white ctermbg=black cterm=NONE
+hi PmenuSel ctermfg=white ctermbg=238 cterm=NONE
+hi PmenuKindSel ctermfg=white ctermbg=238 term=NONE
+
+hi NormalFloat ctermfg=white ctermbg=234
 hi Question ctermfg=white
 hi Search ctermbg=grey
 hi SignColumn ctermbg=NONE

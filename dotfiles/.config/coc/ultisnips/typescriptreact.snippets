@@ -8,12 +8,9 @@
 #	A - Snippet will be triggered automatically, when condition matches.
 
 snippet component "an new react component" b
-import React from "react";
-import {Box} from "bigdatr-style/layout";
+import React, {ReactElement} from "react";
 
-type Props = {};
-
-export default function ${1:`!v expand('%:t:r')`}(props: Props) {
-	return <Box>${1}</Box>;
+export default function ${1:`!v expand('%:t:r')`}(props: {}): ReactElement {
+	return <div>${1}</div>;
 }
 endsnippet

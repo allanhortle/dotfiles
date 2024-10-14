@@ -56,7 +56,7 @@ save_to_clipboard = true
 semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
 
 [window]
-decorations = "buttonless"
+decorations = "None"
 startup_mode = "SimpleFullscreen"
 
 [window.padding]

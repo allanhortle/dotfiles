@@ -26,12 +26,13 @@ Plug 'junegunn/goyo.vim'
 Plug 'junegunn/vim-peekaboo'
 Plug 'jxnblk/vim-mdx-js'
 Plug 'liuchengxu/vista.vim'
-Plug 'mattn/emmet-vim'
 Plug 'mbbill/undotree'
+Plug 'mfussenegger/nvim-dap'
 Plug 'mhinz/vim-startify'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'ruanyl/vim-gh-line'
 Plug 'scrooloose/nerdcommenter'
+Plug 'romainl/vim-qf'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-dadbod'
@@ -41,7 +42,6 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tweekmonster/startuptime.vim'
 Plug 'habamax/vim-godot'
-Plug 'wfxr/minimap.vim'
 Plug 'arthurxavierx/vim-caser'
 
 " Neovim
@@ -58,7 +58,7 @@ set autoindent                  " always set auto-indenting on
 set background=dark
 set backspace=indent,eol,start  " allow backspacing over everything in insert mode
 set backupcopy=auto             " use rename-and-write-new method whenever safe
-set colorcolumn=120
+set colorcolumn=80
 set complete=.,w,b,u,i          " turn off tab completion for tags
 set copyindent                  " copy the previous indentation on auto-indenting
 set cmdwinheight=32             " height of the command history window 
@@ -74,6 +74,7 @@ set lazyredraw                  " dont redraw in the middle of a macro
 set mouse=a
 set nobackup                    " but do not persist backup after successful write
 set noswapfile                  " dont have swap files, they are lame.
+set notermguicolors             " use terminal colors
 set nowrap
 set number                      " always show line numbers
 set numberwidth=1               " make line numbers closer to ~
@@ -159,6 +160,7 @@ endfunction
 autocmd! User GoyoEnter call <SID>goyo_enter()
 autocmd! User GoyoLeave call <SID>goyo_leave()
 
+
 " fzf
 let g:fzf_preview_window = ''
 let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.5 } }
@@ -204,6 +206,10 @@ let g:vista#renderer#icons = {
 \   "variable": "V",
 \  }
 
+" gitgutter
+nmap ]g <Plug>(GitGutterNextHunk)
+nmap [g <Plug>(GitGutterPrevHunk)
+
 
 
 "
@@ -212,7 +218,9 @@ let g:vista#renderer#icons = {
 
 " Extensions
 let g:coc_global_extensions = [
+    \ '@yaegassy/coc-tailwindcss3',
     \ 'coc-dictionary',
+    \ 'coc-emmet',
     \ 'coc-eslint',
     \ 'coc-explorer',
     \ 'coc-json',
@@ -236,6 +244,9 @@ if isdirectory('./node_modules') && isdirectory('./node_modules/eslint')
     let g:coc_global_extensions += ['coc-eslint']
 endif
 
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
 " tab/shift-tab navigate through Pmenu
 function! CheckBackspace() abort
   let col = col('.') - 1
@@ -245,9 +256,9 @@ endfunction
 " tab completion
 inoremap <silent><expr> <TAB>
       \ coc#pum#visible() ? coc#pum#next(1):
-      \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
-inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+inoremap <silent><expr> <c-space> coc#refresh()
+      "\ CheckBackspace() ? "\<Tab>" :
 
 " accept on enter
 inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
@@ -269,6 +280,9 @@ nmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
 xmap <leader>x  <Plug>(coc-convert-snippet)
 vmap <C-j> <Plug>(coc-snippets-select)
 nmap <leader>cl  <Plug>(coc-codelens-action)
+
+nmap ]e <Plug>(coc-diagnostic-next)
+nmap [e <Plug>(coc-diagnostic-prev)
 
 
 "
@@ -300,8 +314,8 @@ vnoremap Y "*y
 nnoremap + <C-a>
 nnoremap - <C-x>
 
-nnoremap <C-j> 1g;
-nnoremap <C-k> 1g,
+nnoremap <C-j> :CocNext<cr>
+nnoremap <C-k> :CocPrev<cr>
 
 " uuid
 inoremap <C-u> <C-r>=system('uuidgen \| tr "[:upper:]" "[:lower:]"')[:-2]<CR><Esc>
@@ -315,19 +329,20 @@ nnoremap gk k
 " leaders
 nnoremap <Leader><Leader> :Buffers<CR>
 nnoremap <Leader>b :bp<CR>
-nnoremap <Leader>d1 :diffget LOCAL<CR>
-nnoremap <Leader>d2 :diffget BASE<CR>
-nnoremap <Leader>d3 :diffget REMOTE<CR>
+nnoremap <Leader>1 :diffget LOCAL<CR>
+nnoremap <Leader>2 :diffget BASE<CR>
+nnoremap <Leader>3 :diffget REMOTE<CR>
 nnoremap <Leader>e :CocList --normal -A diagnostics<CR>
+nnoremap <Leader>w :CocListResume<CR>
 nnoremap <Leader>o :Vista!!<CR>
 nnoremap <Leader>f :bn<CR>
-nnoremap <Leader>h :History<CR>
 nnoremap <Leader>q :bp \|bw #<CR>
 nnoremap <Leader>r :source $MYVIMRC<CR>
 nnoremap <Leader>s :Startify<CR>
 nnoremap <Leader>u :UndotreeToggle<CR>
 nnoremap <Leader>v :e $MYVIMRC<CR>
-nnoremap <Leader>w :TSHighlightCapturesUnderCursor<CR>
+nnoremap <Leader>h :History<CR>
+nnoremap <Leader>j :TSHighlightCapturesUnderCursor<CR>
 
 " tig
 nnoremap <Leader>tt :Tig<CR>
@@ -356,7 +371,7 @@ command! -bang WQ wq<bang>
 command! -bang Wqa wqa<bang>
 command! -bang WQa wqa<bang>
 command! -bang WQA wqa<bang>
-command! Work :vsplit ~/Dropbox/work.md
+command! Notes :vsplit ~/Dropbox/work/notes.md
 command! Scratch :vsplit ~/.scratch.txt
 
 " nops

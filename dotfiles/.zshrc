@@ -4,6 +4,7 @@ if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
 fi
 
+
 #autoload -Uz compinit
 autoload -U colors && colors
 autoload -Uz vcs_info
@@ -51,6 +52,8 @@ setopt pushd_ignore_dups
 [ "$SAVEHIST" -lt 10000 ] && SAVEHIST=10000
 
 
+# fzf
+source <(fzf --zsh)
 
 #
 # Prompt
@@ -162,7 +165,7 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git"'
 export FZF_DEFAULT_OPTS='--color=16,bg+:-1,pointer:2,prompt:2,hl+:2,hl:2,fg+:2'
 export EDITOR="/opt/homebrew/bin/nvim"
 export HOMEBREW_NO_INSTALL_UPGRADE=1
-export DOCKER_HOST="unix://$HOME/.colima/docker.sock"
+export GPG_TTY=$(tty)
 
 
 #
@@ -260,6 +263,7 @@ alias coverage="open coverage/lcov-report/index.html"
 
 alias check="gh pr checks --watch"
 alias checks="check; saycode"
+alias {review,reviews}="gh pr list -S 'review-requested:@me status:success' | cut -f1 | xargs -n1 -- gh pr view --web"
 
 function pr-checkout() {
   local pr_number
@@ -281,11 +285,12 @@ alias prs="gh pr status"
 alias prc="gh pr create"
 alias prl="gh pr list"
 alias changes="gh pr diff | delta -s"
-alias checks="gh checks --watch"
+alias checks="gh pr checks --watch"
 
 # data
 alias music="vd --quitguard ~/Dropbox/data/albums.csv"
-alias to='vim ~/Dropbox/work.md'
+alias notes='vim ~/Dropbox/work/notes.md'
+
 function links() {
     gum spin --title "Fetching Raindrops" --show-output -- http -A bearer -a $RAINDROP_TOKEN GET https://api.raindrop.io/rest/v1/raindrops/0\?perpage=40\
         | jq -r ".items[] | [.title, .link, (.created|split(\".\")[0] + \"Z\"|fromdate|strflocaltime(\"%b %d %H:%m\"))] | @csv"\
@@ -327,7 +332,13 @@ alias -- -='cd -'
 alias ...="../.."
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias pp="pino-pretty --ignore pid,hostname -t HH:MM:ss"
-#alias saycode='say "${pipestatus[1]}"'
+
+# python
+alias python="python3"
+alias pip="pip3"
+
+
+# Say outloud if the status code was not 0
 function saycode() {
     if [ $? -eq 0 ]; then
         say "success"
@@ -335,6 +346,7 @@ function saycode() {
         say "failure"
     fi
 }
+alias floater="alacritty -o \"window.decorations='Full'\" -o \"window.startup_mode='Windowed'\""
 
 
 
@@ -347,6 +359,7 @@ fi
 
 
 
+
 # bun 
 [ -s "/Users/allanhortle/.bun/_bun" ] && source "/Users/allanhortle/.bun/_bun"
 export BUN_INSTALL="$HOME/.bun"
@@ -356,3 +369,6 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 autoload bashcompinit && bashcompinit
 autoload -Uz compinit && compinit
 complete -C '/opt/homebrew/bin/aws_completer' aws
+
+# Created by `pipx` on 2024-07-11 00:33:36
+export PATH="$PATH:/Users/allanhortle/.local/bin"

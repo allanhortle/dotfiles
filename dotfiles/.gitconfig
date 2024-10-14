@@ -1,5 +1,6 @@
 [core]
 	editor = nvim
+    attributesfile = ~/.gitattributes
 [commit]
     verbose = true
 [user]
@@ -24,10 +25,8 @@
 	keepBackup = false
 [color]
 	ui = true
-
 [tig "bind"]
     generic = D !git difftool --tool=vimdiff --no-prompt --trust-exit-code %(commit)^!
-
 [difftool "vimdiff3"]
 	path = nvim
 [mergetool "vimdiff"]
@@ -37,3 +36,8 @@
 [alias]
     fixup = "!git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup"
 
+[includeIf "gitdir:~/tactiq/**"]
+    path = ~/tactiq/.gitconfig
+
+[gpg]
+	program = /opt/homebrew/bin/gpg
