@@ -58,7 +58,7 @@ hi def link @constant.builtin @constant
 hi def link @number @constant
 
 hi def link @string @string
-hi def link @string.regex @string
+hi def link @string.regexp @string
 
 hi def link @tag.attribute @tag
 hi def link @label @tag

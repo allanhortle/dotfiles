@@ -102,6 +102,11 @@ set wildmenu
 set wildmode=longest:full,full
 set writebackup                 " protect against crash-during-write
 
+" Treesiter folding
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
+set nofoldenable                     " Disable folding at startup.
+
 " Vim only settings
 if !has('nvim')
     set ttymouse=sgr                " make the mouse work after line 223
@@ -265,12 +270,13 @@ inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<C
 
 " Coc Mappings
 nmap <silent> gd <Plug>(coc-definition)
+nmap <2-LeftMouse> <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 nmap <leader>rn <Plug>(coc-rename)
 nnoremap <silent> K :call CocAction('doHover')<CR>
-nnoremap <C-o> :CocCommand explorer<CR>
+nnoremap <C-]> :CocCommand explorer<CR>
 nnoremap <C-L> :execute 'CocCommand explorer ' . expand('%:h')<CR>
 " Applying codeAction to the selected region.
 " Example: `<leader>aap` for current paragraph
@@ -380,7 +386,6 @@ nnoremap <Down> <nop>
 nnoremap <Left> <nop>
 nnoremap <Right> <nop>
 nnoremap <BS> <nop>
-nnoremap <TAB> <nop>
 nnoremap q: <nop>
 
 
