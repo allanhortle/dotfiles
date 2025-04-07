@@ -27,7 +27,6 @@ Plug 'junegunn/vim-peekaboo'
 Plug 'jxnblk/vim-mdx-js'
 Plug 'liuchengxu/vista.vim'
 Plug 'mbbill/undotree'
-Plug 'mfussenegger/nvim-dap'
 Plug 'mhinz/vim-startify'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'ruanyl/vim-gh-line'
@@ -49,6 +48,13 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/playground'
 Plug 'David-Kunz/treesitter-unit'
 Plug 'echasnovski/mini.surround'
+
+" AI
+Plug 'nvim-lua/plenary.nvim'
+Plug 'olimorris/codecompanion.nvim'
+Plug 'j-hui/fidget.nvim'
+
+
 call plug#end() 
 
 
