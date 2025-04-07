@@ -16,6 +16,10 @@
 	prompt = false
 [diff]
 	tool = vimdiff3
+    algorithm = histogram
+    colorMoved = plain
+    mnemonicPrefix = true
+    renames = true
 [pager]
 	branch = false
 [pull]
@@ -41,3 +45,12 @@
 
 [gpg]
 	program = /opt/homebrew/bin/gpg
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+[advice]
+    addEmptyPathspec = false
+

@@ -263,7 +263,7 @@ alias coverage="open coverage/lcov-report/index.html"
 
 alias check="gh pr checks --watch"
 alias checks="check; saycode"
-alias {review,reviews}="gh pr list -S 'review-requested:@me status:success' | cut -f1 | xargs -n1 -- gh pr view --web"
+alias {review,reviews}="gh pr list -S 'is:open is:pr draft:false review-requested:@me' | cut -f1 | xargs -n1 -- gh pr view --web"
 
 function pr-checkout() {
   local pr_number
@@ -281,7 +281,14 @@ function pr-checkout() {
 }
 
 # Github
-alias prs="gh pr status"
+function prs() {
+    gh pr list --search='is:open is:pr -label:personal-environment -label:dependencies sort:updated-desc' \
+        --json number,author,title,headRefName \
+        --template '{{range .}}{{tablerow (.number) (.author.login) (.title)}}{{end}}'\
+        | fzf \
+        | cut -d ' ' -f1 \
+        | xargs gh pr view --web
+}
 alias prc="gh pr create"
 alias prl="gh pr list"
 alias changes="gh pr diff | delta -s"
@@ -299,14 +306,6 @@ function links() {
         | xargs open 
 }
 
-function pr() {
-    gh pr ls --json number,title,headRefName,state,statusCheckRollup\
-        | jq -r 'sort_by(.headRefName) | .[] | [.number, .state, (.statusCheckRollup | last | .conclusion), .title, .headRefName] | @csv'\
-        | gum table -c,,,,, -w 4,4,7,40,40\
-        | cut -d "," -f 1\
-        | awk '{print "https://github.com/bigdatr/bigdatr-v2/pull/"$1}'\
-        | xargs open 
-}
 
 alias scripts='cat package.json | jq -r ".scripts | to_entries | .[] | [.key, .value] | @csv" | gum table -c ,, -w 30,50 | cut -d "," -f 1 | xargs yarn run'
 

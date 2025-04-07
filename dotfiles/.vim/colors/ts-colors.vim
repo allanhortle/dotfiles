@@ -11,10 +11,10 @@ hi @none ctermfg=white cterm=NONE
 hi @keyword ctermfg=red cterm=NONE
 hi @constant ctermfg=blue cterm=NONE
 hi @string ctermfg=green cterm=NONE
+hi @comment ctermfg=242 cterm=italic
 hi @type ctermfg=yellow cterm=NONE
 "hi @type ctermfg=yellow cterm=NONE
 hi @tag ctermfg=yellow cterm=NONE
-hi @comment ctermfg=242 cterm=italic
 "hi typescriptIdentifierName ctermfg=red ctermbg=blue cterm=none
 
 " Reset ? Default vim
