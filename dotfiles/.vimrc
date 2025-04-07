@@ -48,6 +48,7 @@ Plug 'arthurxavierx/vim-caser'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/playground'
 Plug 'David-Kunz/treesitter-unit'
+Plug 'echasnovski/mini.surround'
 call plug#end() 
 
 
@@ -80,13 +81,13 @@ set number                      " always show line numbers
 set numberwidth=1               " make line numbers closer to ~
 set rtp+=/usr/local/opt/fzf
 set shiftround                  " use multiple of shiftwidth when indenting with '<' and '>'
-set shiftwidth=4                " number of spaces to use for auto-indenting
+set shiftwidth=2                " number of spaces to use for auto-indenting
 set showcmd
 set showmatch                   " set show matching 
 set signcolumn=number
 set smartcase                   " ignore case if search pattern is all lower-case case-sensitive otherwise
 set smarttab                    " insert tabs on the start of a line according to shiftwidth, not tabstop
-set softtabstop=4
+set softtabstop=2
 set splitbelow                 
 set splitright                  
 set spellsuggest=best,10
@@ -379,6 +380,8 @@ command! -bang WQa wqa<bang>
 command! -bang WQA wqa<bang>
 command! Notes :vsplit ~/Dropbox/work/notes.md
 command! Scratch :vsplit ~/.scratch.txt
+command! Staged :GFiles --modified
+command! Modified :GFiles --modified
 
 " nops
 nnoremap <Up> <nop>
