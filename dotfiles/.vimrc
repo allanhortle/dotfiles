@@ -29,7 +29,6 @@ Plug 'liuchengxu/vista.vim'
 Plug 'mbbill/undotree'
 Plug 'mhinz/vim-startify'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'ruanyl/vim-gh-line'
 Plug 'scrooloose/nerdcommenter'
 Plug 'romainl/vim-qf'
 Plug 'tpope/vim-abolish'
@@ -38,6 +37,7 @@ Plug 'tpope/vim-dadbod'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-markdown'
 Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-rhubarb'
 Plug 'tpope/vim-surround'
 Plug 'tweekmonster/startuptime.vim'
 Plug 'habamax/vim-godot'
@@ -206,6 +206,12 @@ let g:ctrlsf_extra_backend_args={ 'rg': '-U --ignore-file "*.lock"' }
 let g:coc_node_path = '~/.fnm/aliases/default/bin/node'
 
 
+" gh-line
+let g:gh_cgit_url_pattern_sub = [
+    \ [':Tactiq-HQ/main.git', 'http://git.savannah.gnu.org/cgit/'],
+ \ ]
+
+
 " vista
 "let g:vista_icon_indent = ["▸ ", ""]
 let g:vista#renderer#enable_icon = 0
@@ -311,7 +317,6 @@ onoremap au :<c-u>lua require"treesitter-unit".select(true)<CR>
 " Keyboard Mapping
 "
 nmap <F1> :echo expand('%:p')<cr>
-set pastetoggle=<F2>
 map <F3> :set wrap!<CR>:set linebreak!<CR>
 map <F6> :setlocal spell! spelllang=en_au<CR>
 map <F7> :Goyo<CR>

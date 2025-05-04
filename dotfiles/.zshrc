@@ -261,9 +261,6 @@ function git_fixup() {
 
 alias coverage="open coverage/lcov-report/index.html"
 
-alias check="gh pr checks --watch"
-alias checks="check; saycode"
-alias {review,reviews}="gh pr list -S 'is:open is:pr draft:false review-requested:@me' | cut -f1 | xargs -n1 -- gh pr view --web"
 
 function pr-checkout() {
   local pr_number
@@ -289,6 +286,9 @@ function prs() {
         | cut -d ' ' -f1 \
         | xargs gh pr view --web
 }
+alias check="gh pr checks --watch"
+alias checks="check; saycode"
+alias {review,reviews}="gh pr list -S 'is:open is:pr draft:false review-requested:@me' | cut -f1 | xargs -n1 -- gh pr view --web"
 alias prc="gh pr create"
 alias prl="gh pr list"
 alias changes="gh pr diff | delta -s"
