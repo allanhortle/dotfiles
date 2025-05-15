@@ -294,6 +294,18 @@ alias prl="gh pr list"
 alias changes="gh pr diff | delta -s"
 alias checks="gh pr checks --watch"
 
+function whoreview() {
+  join -a1 -e0 -o 2.2,1.1 \
+      <(gh api --paginate "orgs/Tactiq-HQ/teams/engineering/members" --jq '.[].login' | sort) \
+      <(gh pr list --search 'is:open draft:false' --json reviewRequests \
+        | jq -r '.[] .reviewRequests[].login // empty' \
+        | sort \
+        | uniq -c \
+        | awk '{ print $2, $1 }') \
+    | sort -k1,1n \
+    | awk '!/allan|cam|nithin|alex/'
+}
+
 # data
 alias music="vd --quitguard ~/Dropbox/data/albums.csv"
 alias notes='vim ~/Dropbox/work/notes.md'

@@ -66,11 +66,13 @@ hi def link @property @tag
 hi def link @tag.builtin.tsx @tag
 
 " Markdown
-hi def link @label.markdown @comment
 hi def link @markup.heading @tag
 hi def link @markup.heading.2 @tag
 hi def link @markup.heading.3 @tag
 hi def link @markup.link @constant
+hi def link @markup.raw.markdown_inline @string " inline code
+hi def link @label.markdown @string " code block tags
+hi def link @markup.raw.block.markdown @none " code blocks
 
 
 
