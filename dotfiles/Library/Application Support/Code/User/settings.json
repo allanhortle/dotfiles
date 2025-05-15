@@ -7,5 +7,9 @@
   "security.promptForLocalFileProtocolHandling": false,
   "security.workspace.trust.enabled": false,
   "security.workspace.trust.untrustedFiles": "open",
-  "workbench.editorAssociations": { "*.plist": "default" }
+  "workbench.editorAssociations": { "*.plist": "default" },
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#000",
+    "foreground": "#000000"
+  }
 }
