@@ -3,9 +3,11 @@
     "editor.defaultFormatter": "biomejs.biome",
     "editor.formatOnSave": true,
     "editor.semanticHighlighting.enabled": true,
+    "editor.matchBrackets": "never",
     "extensions.experimental.affinity": {
         "asvetliakov.vscode-neovim": 1
     },
+    "editor.bracketPairColorization.enabled": false,
     "security.promptForLocalFileProtocolHandling": false,
     "security.workspace.trust.enabled": false,
     "security.workspace.trust.untrustedFiles": "open",
@@ -17,30 +19,37 @@
         "markdown",
         "scminput"
     ],
-    // Status bar - maybe replace with APC https://github.com/drcika/apc-extension
-    "nvim-ui.nvimColorNormal": "#6871ff",
-    "nvim-ui.nvimColorInsert": "#cbe645",
-    "nvim-ui.nvimColorVisual": "#ff77ff",
-    "nvim-ui.nvimColorCustomizationKeys":  ["statusBar.background"],
 
     "workbench.colorTheme": "Ayu Mirage",
+    "workbench.editor.showTabs": "none",
+    "breadcrumbs.enabled": false,
     "workbench.colorCustomizations": {
+        // Borders
         "foreground": "#d9d7ce",
         "sideBar.border": "#11141b",
         "editorGroupHeader.tabsBorder": "#11141b",
+        "editorGroup.border": "#11141b",
         "titleBar.border": "#11141b",
         "tab.border": "#11141b",
         "statusBar.border": "#11141b",
+        "sideBySideEditor.verticalBorder": "#11141b",
+        "sideBySideEditor.horizontalBorder": "#11141b",
+        "editor.compositionBorder": "#11141b",
+
+        // Backgrounds
         "editor.background": "#1A1F28",
         "sideBar.background": "#1A1F28",
         "tab.activeBackground": "#1A1F28",
+        "tab.inactiveBackground": "#1A1F28",
         "titleBar.activeBackground": "#1A1F28",
         "editorGroupHeader.tabsBackground": "#1A1F28",
-        "statusBar.foreground": "#1A1F28",
         "editor.border": "#1A1F28",
+        "sideBarSectionHeader.background": "#1A1F28",
+        "sideBarSectionHeader.border": "#1A1F28",
 
         "focusBorder": "#686868",
-        "statusBar.background": "#6871ff",
+        "statusBar.background": "#1A1F28",
+        "statusBar.foreground": "#d9d7ce",
 
         "gitDecoration.addedResourceForeground": "#d9d7ce",
         "gitDecoration.modifiedResourceForeground": "#d9d7ce",
@@ -53,6 +62,63 @@
         "gitDecoration.conflictingResourceForeground": "#d9d7ce",
         "gitDecoration.submoduleResourceForeground": "#d9d7ce",
     },
+    "editor.tokenColorCustomizations": {
+    "textMateRules": [
+        // comments
+        {"scope": "entity.name.type.instance.jsdoc", "settings": {"foreground": "#B8CFE680" }},
+        {"scope": "variable.other.jsdoc", "settings": {"foreground": "#B8CFE680" }},
+        {"scope": "storage.type.class.jsdoc", "settings": {"foreground": "#B8CFE680" }},
+        //reset 
+        {"scope": "keyword.operator", "settings": {"foreground": "#d9d7ce" }},
+        {"scope": "meta.parameter", "settings": {"foreground": "#d9d7ce" }},
+        {"scope": "punctuation.accessor", "settings": {"foreground": "#d9d7ce" }},
+        // Yellow
+        {"scope": "support.type.property-name", "settings": {"foreground": "#ffdf80" }},
+        {"scope": "support.type", "settings": {"foreground": "#ffdf80" }},
+        {"scope": "support.class.component", "settings": {"foreground": "#ffdf80" }},
+        {"scope": "entity.name.tag", "settings": {"foreground": "#ffdf80" }},
+        {"scope": "storage.type.type", "settings": {"foreground": "#ffdf80" }},
+        {"scope": "meta.type.declaration", "settings": {"foreground": "#ffdf80" }},
+        {"scope": "meta.type.annotation", "settings": {"foreground": "#ffdf80" }},
+        {"scope": "meta.type", "settings": {"foreground": "#ffdf80" }},
+        {"scope": "meta.type.tuple", "settings": {"foreground": "#ffdf80" }},
+        {"scope": "punctuation.definition.tag.begin", "settings": {"foreground": "#ffdf80" }},
+        {"scope": "punctuation.definition.tag.end", "settings": {"foreground": "#ffdf80" }},
+        {"scope": "punctuation.section.embedded.begin", "settings": {"foreground": "#ffdf80" }},
+        {"scope": "punctuation.section.embedded.end", "settings": {"foreground": "#ffdf80" }},
+        {"scope": "punctuation.definition.typeparameters", "settings": {"foreground": "#ffdf80" }},
+        
+        // Green
+        {"scope": "string", "settings": {"foreground": "#cbe645" }},
+        {"scope": "punctuation.definition.template-expression", "settings": {"foreground": "#cbe645" }},
+
+        // Blue
+        {"scope": "constant.language", "settings": {"foreground": "#6871ff" }},
+        {"scope": "constant.numeric", "settings": {"foreground": "#6871ff" }},
+        
+        // Keywords
+        {"scope": "keyword.control", "settings": {"foreground": "#f07178" }},
+        {"scope": "storage", "settings": {"foreground": "#f07178" }},
+        {"scope": "storage.type", "settings": {"foreground": "#f07178" }},
+        {"scope": "storage.type.function", "settings": {"foreground": "#f07178" }},
+        {"scope": "variable.language", "settings": {"foreground": "#f07178" }},
+    ]
+    },
+    "editor.semanticTokenColorCustomizations": {
+        "rules": {
+            "parameter": "#d9d7ce",
+            "function": "#d9d7ce",
+            "namespace": "#d9d7ce",
+            "method": "#d9d7ce",
+            "class": "#d9d7ce",
+
+            "type": "#ffdf80",
+            "interface": "#ffdf80",
+            "enum": "#ffdf80",
+        },
+    },
+    "workbench.editor.editorActionsLocation": "hidden",
+    "window.customTitleBarVisibility": "windowed",
 }
 
 /*
