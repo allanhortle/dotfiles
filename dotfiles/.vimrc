@@ -560,3 +560,7 @@ function! TabLine() abort
     return s
 endfunction
 set tabline=%{%TabLine()%}
+
+
+
+" Send modes to vscode
