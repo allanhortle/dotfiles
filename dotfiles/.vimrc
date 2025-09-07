@@ -40,7 +40,6 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-rhubarb'
 Plug 'tpope/vim-surround'
 Plug 'tweekmonster/startuptime.vim'
-Plug 'habamax/vim-godot'
 Plug 'arthurxavierx/vim-caser'
 
 " Neovim
@@ -48,11 +47,7 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/playground'
 Plug 'David-Kunz/treesitter-unit'
 Plug 'echasnovski/mini.surround'
-
-" AI
-Plug 'nvim-lua/plenary.nvim'
-Plug 'olimorris/codecompanion.nvim'
-Plug 'j-hui/fidget.nvim'
+Plug 'dmmulroy/tsc.nvim'
 
 
 call plug#end() 
@@ -295,6 +290,9 @@ nnoremap <C-L> :execute 'CocCommand explorer ' . expand('%:h')<CR>
 " Example: `<leader>aap` for current paragraph
 xmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
 nmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
+
+nmap <leader>as  <Plug>(coc-codeaction-source)
+
 " Run the Code Lens action on the current line.
 xmap <leader>x  <Plug>(coc-convert-snippet)
 vmap <C-j> <Plug>(coc-snippets-select)
@@ -329,8 +327,8 @@ nnoremap <C-f> :CtrlSF
 nnoremap <CR> :noh<CR><CR>
 nnoremap Q @@
 vnoremap Y "*y
-nnoremap + <C-a>
-nnoremap - <C-x>
+nnoremap + <C-x>
+nnoremap - <C-a>
 
 nnoremap <C-j> :CocNext<cr>
 nnoremap <C-k> :CocPrev<cr>
@@ -416,6 +414,8 @@ augroup END
 
 " json comments
 autocmd FileType json syntax match Comment +\/\/.\+$+
+
+
 
 syntax reset
 syntax on

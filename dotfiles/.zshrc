@@ -259,6 +259,10 @@ function git_fixup() {
     git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup | git rebase -i --autosquash $1
 }
 
+function branch_delete() {
+  gb -vv | grep -Ev "master|\*" | fzf -m | awk '{print $1}' | xargs -I {} git branch -D '{}'
+}
+
 alias coverage="open coverage/lcov-report/index.html"
 
 

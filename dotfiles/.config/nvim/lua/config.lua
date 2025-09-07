@@ -30,16 +30,4 @@ require('nvim-treesitter.configs').setup {
 }
 
 require('mini.surround').setup()
-
-
-require("codecompanion").setup({
-  strategies = {
-    chat = {
-      adapter = "copilot",
-    },
-    inline = {
-      adapter = "copilot"
-    },
-  },
-})
-require("plugins.codecompanion.fidget-spinner").init()
+require('tsc').setup()

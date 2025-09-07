@@ -12,6 +12,9 @@
 [merge]
 	conflictstyle = merge
 	tool = vimdiff
+[merge "json"]
+    name = custom merge driver for json files
+    driver = git-json-merge %A %O %B
 [difftool]
 	prompt = false
 [diff]

@@ -1,52 +1,37 @@
 {
-    "coc.preferences.formatOnSave": true,
-    "coc.preferences.renameFillCurrent": false,
-    "workspace.rootPatterns": [
-        "package.json",
-        ".git"
-    ],
-    "coc.source.dictionary.filetypes": [
-        "markdown"
-    ],
-    "coc.source.word.filetypes": [
-        "markdown"
-    ],
-    "snippets.priority": 1,
-    "snippets.loadFromExtensions": false,
-    "explorer.file.showHiddenFiles": true,
-    "explorer.quitOnOpen": true,
-    "explorer.keyMappings.global": {
-        "<c-v>": "open:vsplit"
-    },
-    "javascript.validate.enable": false,
-    "suggest.noselect": true,
-    "tsserver.log": "verbose",
-    "tsserver.trace.server": "verbose",
-    "typescript.autoClosingTags": false,
-    "workspace.bottomUpFiletypes": [
-        "typescriptreact",
-        "typescript"
-    ],
-    "python.formatting.provider": "black",
-    "python.formatting.blackPath": "/opt/homebrew/bin/black",
-    "snippets.ultisnips.pythonPrompt": false,
-    "typescript.preferGoToSourceDefinition": true,
-    "hover.floatConfig": {
-        "maxWidth": 200
-    },
-    "tsserver.useLocalTsdk": true,
-    "tsserver.maxTsServerMemory": 8192,
-    "tailwindCSS.experimental.classRegex": [
-        [
-            "([\"'`][^\"'`]*.*?[\"'`])",
-            "[\"'`]([^\"'`]*).*?[\"'`]"
-        ]
-    ],
-    "prettier.disableLanguages": [
-        "markdown"
-    ],
-    "prettier.enable": false,
-    "biome.enable": true,
-    "biome.requireConfiguration": true,
-    "json.format.enable": false
+	"coc.preferences.formatOnSave": true,
+	"coc.preferences.renameFillCurrent": false,
+	"workspace.rootPatterns": ["package.json", ".git"],
+	"coc.source.dictionary.filetypes": ["markdown"],
+	"coc.source.word.filetypes": ["markdown"],
+	"snippets.priority": 1,
+	"snippets.loadFromExtensions": false,
+	"explorer.file.showHiddenFiles": true,
+	"explorer.quitOnOpen": true,
+	"explorer.keyMappings.global": {
+		"<c-v>": "open:vsplit"
+	},
+	"javascript.validate.enable": false,
+	"suggest.noselect": true,
+	"tsserver.log": "verbose",
+	"tsserver.trace.server": "verbose",
+	"typescript.autoClosingTags": false,
+	"workspace.bottomUpFiletypes": ["typescriptreact", "typescript"],
+	"python.formatting.provider": "black",
+	"python.formatting.blackPath": "/opt/homebrew/bin/black",
+	"snippets.ultisnips.pythonPrompt": false,
+	"typescript.preferGoToSourceDefinition": true,
+	"hover.floatConfig": {
+		"maxWidth": 200
+	},
+	"tsserver.useLocalTsdk": true,
+	"tsserver.maxTsServerMemory": 8192,
+	"tailwindCSS.experimental.classRegex": [
+		["([\"'`][^\"'`]*.*?[\"'`])", "[\"'`]([^\"'`]*).*?[\"'`]"]
+	],
+	"prettier.disableLanguages": ["markdown"],
+	"prettier.enable": false,
+	"biome.enable": true,
+	"biome.requireConfiguration": true,
+	"json.format.enable": false
 }
