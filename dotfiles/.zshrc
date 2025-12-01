@@ -227,7 +227,7 @@ function layout() {
     repeat make {tmux split-window}; 
     # do the layout
     tmux select-layout main-vertical
-    tmux resize-pane -t 1 -x 123
+    tmux resize-pane -t 1 -x 145
     tmux select-pane -t 1
 }
 
@@ -282,6 +282,11 @@ function pr-checkout() {
 }
 
 # Github
+alias prm="gh pr list --author=@me --draft=false --json=url --jq '.[].url' | xargs -I {} open {}"
+alias {review,reviews,prr}="gh pr list -S 'is:open is:pr draft:false review-requested:@me' | cut -f1 | xargs -n1 -- gh pr view --web"
+alias prc="gh pr create"
+alias changes="gh pr diff | delta -s"
+alias checks="gh pr checks --watch; saycode"
 function prs() {
     gh pr list --search='is:open is:pr -label:personal-environment -label:dependencies sort:updated-desc' \
         --json number,author,title,headRefName \
@@ -290,13 +295,6 @@ function prs() {
         | cut -d ' ' -f1 \
         | xargs gh pr view --web
 }
-alias check="gh pr checks --watch"
-alias checks="check; saycode"
-alias {review,reviews}="gh pr list -S 'is:open is:pr draft:false review-requested:@me' | cut -f1 | xargs -n1 -- gh pr view --web"
-alias prc="gh pr create"
-alias prl="gh pr list"
-alias changes="gh pr diff | delta -s"
-alias checks="gh pr checks --watch"
 
 # data
 alias music="vd --quitguard ~/Dropbox/data/albums.csv"

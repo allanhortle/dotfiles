@@ -6,6 +6,7 @@ black = "0x686868"
 blue = "0x6871ff"
 cyan = "0xa6fde1"
 green = "0xcbe645"
+#green = "0xbae67e"
 magenta = "0xff77ff"
 red = "0xf07178"
 white = "0xffffff"
@@ -26,22 +27,26 @@ background = "0x212733"
 foreground = "0xd9d7ce"
 
 [font]
-size = 14.0
+size = 16
 
 [font.bold]
-family = "CommitMono"
-style = "Bold"
+#family = "CommitMono"
+#style = "Bold"
+family = "FixederSys Light 2x"
 
 [font.glyph_offset]
-y = 1
+y = 0
+[font.offset]
+y = -3
 
 [font.italic]
-family = "CommitMono"
-style = "Italic"
+#family = "CommitMono"
+#style = "Italic"
+family = "FixederSys Light 2x"
 
 [font.normal]
-family = "CommitMono"
-style = "Regular"
+family = "FixederSys Light 2x"
+#style = "Light"
 
 [[keyboard.bindings]]
 chars = "\u001E"
