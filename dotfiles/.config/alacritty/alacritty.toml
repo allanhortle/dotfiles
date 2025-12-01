@@ -1,5 +1,34 @@
+#
+# Settings
+# 
+
 [general]
 live_config_reload = true
+
+[[keyboard.bindings]]
+chars = "\u001E"
+key = "Key6"
+mods = "Control"
+
+[[keyboard.bindings]]
+action = "ToggleMaximized"
+key = "F11"
+
+[selection]
+save_to_clipboard = true
+semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
+
+[window]
+#decorations = "Buttonless"
+startup_mode = "SimpleFullscreen"
+
+[window.padding]
+x = 8
+y = 4
+
+#
+# Colors
+#
 
 [colors.bright]
 black = "0x686868"
@@ -26,45 +55,21 @@ yellow = "0xffcc66"
 background = "0x212733"
 foreground = "0xd9d7ce"
 
+
+#
+# Fonts
+#
+
 [font]
+
+# CommitMono
+#size = 14
+#normal = { family = "CommitMono", style = "Regular" }
+#glyph_offset = {y = 1}
+
+# FixederSys
 size = 16
+normal = { family = "FixederSys Light 2x"}
+glyph_offset = {y = 0}
+offset = {y = -3}
 
-[font.bold]
-#family = "CommitMono"
-#style = "Bold"
-family = "FixederSys Light 2x"
-
-[font.glyph_offset]
-y = 0
-[font.offset]
-y = -3
-
-[font.italic]
-#family = "CommitMono"
-#style = "Italic"
-family = "FixederSys Light 2x"
-
-[font.normal]
-family = "FixederSys Light 2x"
-#style = "Light"
-
-[[keyboard.bindings]]
-chars = "\u001E"
-key = "Key6"
-mods = "Control"
-
-[[keyboard.bindings]]
-action = "ToggleMaximized"
-key = "F11"
-
-[selection]
-save_to_clipboard = true
-semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
-
-[window]
-#decorations = "Buttonless"
-startup_mode = "SimpleFullscreen"
-
-[window.padding]
-x = 8
-y = 4
