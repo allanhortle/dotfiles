@@ -169,19 +169,24 @@ autocmd! User GoyoLeave call <SID>goyo_leave()
 
 
 " fzf
-let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.5, 'border': 'rounded' } }
+let g:fzf_vim = {}
+let g:fzf_vim.files_options = '--style minimal'
+let g:fzf_vim.buffers_options = '--style minimal'
+let g:fzf_vim.preview_window = ''
+let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.5} }
 let g:fzf_colors = {
 \ 'fg+':      ['fg', '@string'],
 \ 'hl':      ['fg', '@string'],
 \ 'pointer': ['fg', '@string'],
 \ 'hl+':      ['fg', 'Normal'],
 \ 'fg':      ['fg', 'Normal'],
-\ 'border':  ['fg', 'Normal'],
+\ 'border':  ['fg', '@comment'],
 \ 'info':    ['fg', '@comment'],
 \ 'prompt':  ['fg', '@comment'],
 \}
 
 command! -bang -nargs=? -complete=dir Files call fzf#vim#files(<q-args>, {'options': ['-i']}, <bang>0)
+
 function! s:fzf_statusline()
   setlocal statusline=%#Normal#
 endfunction

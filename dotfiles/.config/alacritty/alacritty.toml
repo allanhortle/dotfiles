@@ -4,6 +4,9 @@
 
 [general]
 live_config_reload = true
+import = [
+    "~/.config/alacritty/themes/ayu.toml"
+]
 
 [[keyboard.bindings]]
 chars = "\u001E"
@@ -21,39 +24,8 @@ semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
 [window]
 #decorations = "Buttonless"
 startup_mode = "SimpleFullscreen"
-
-[window.padding]
-x = 8
-y = 4
-
-#
-# Colors
-#
-
-[colors.bright]
-black = "0x686868"
-blue = "0x6871ff"
-cyan = "0xa6fde1"
-green = "0xcbe645"
-#green = "0xbae67e"
-magenta = "0xff77ff"
-red = "0xf07178"
-white = "0xffffff"
-yellow = "0xffdf80"
-
-[colors.normal]
-black = "0x1A1F28"
-blue = "0x36a3d9"
-cyan = "0x95e6cb"
-green = "0xbae67e"
-magenta = "0xd4bfff"
-red = "0xf07178"
-white = "0xc7c7c7"
-yellow = "0xffcc66"
-
-[colors.primary]
-background = "0x212733"
-foreground = "0xd9d7ce"
+dynamic_padding = true
+padding = {x = 8, y = 4}
 
 
 #
@@ -61,15 +33,13 @@ foreground = "0xd9d7ce"
 #
 
 [font]
-
-# CommitMono
-#size = 14
-#normal = { family = "CommitMono", style = "Regular" }
-#glyph_offset = {y = 1}
+size = 14
+normal = { family = "CommitMono", style = "Regular" }
+glyph_offset = {y = 1}
 
 # FixederSys
-size = 16
-normal = { family = "FixederSys Light 2x"}
-glyph_offset = {y = 0}
-offset = {y = -3}
+#size = 16
+#normal = { family = "FixederSys Light 2x"}
+#glyph_offset = {y = 0}
+#offset = {y = -3}
 

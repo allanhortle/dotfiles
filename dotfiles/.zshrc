@@ -286,14 +286,18 @@ alias prm="gh pr list --author=@me --draft=false --json=url --jq '.[].url' | xar
 alias {review,reviews,prr}="gh pr list -S 'is:open is:pr draft:false review-requested:@me' | cut -f1 | xargs -n1 -- gh pr view --web"
 alias prc="gh pr create"
 alias changes="gh pr diff | delta -s"
-alias checks="gh pr checks --watch; saycode"
+function checks() {
+   gh pr checks \
+     --json bucket,name,startedAt\
+     --template '{{range .}}{{$c := "white+d"}}{{if eq .bucket "fail"}}{{$c = "red"}}{{else if eq .bucket "pending"}}{{$c = "yellow"}}{{end}}{{autocolor $c (printf "%-10s %-40s %s\n" .bucket .name (timeago .startedAt))}}{{end}}'
+}
 function prs() {
-    gh pr list --search='is:open is:pr -label:personal-environment -label:dependencies sort:updated-desc' \
-        --json number,author,title,headRefName \
-        --template '{{range .}}{{tablerow (.number) (.author.login) (.title)}}{{end}}'\
-        | fzf \
+    gh pr list --search='is:open is:pr -label:personal-environment sort:updated-desc' \
+        --json number,author,title,headRefName,updatedAt \
+        --template '{{range .}}{{tablerow (.number) (.author.login) (timeago .updatedAt) (.title)}}{{end}}'\
+        | fzf -m \
         | cut -d ' ' -f1 \
-        | xargs gh pr view --web
+        | xargs -L 1 gh pr view --web
 }
 
 # data
