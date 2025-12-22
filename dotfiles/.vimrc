@@ -43,7 +43,7 @@ Plug 'tweekmonster/startuptime.vim'
 Plug 'arthurxavierx/vim-caser'
 
 " Neovim
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/nvim-treesitter', {'tag': 'v0.9.2', 'do': ':TSUpdate'}
 Plug 'nvim-treesitter/playground'
 Plug 'David-Kunz/treesitter-unit'
 Plug 'echasnovski/mini.surround'
