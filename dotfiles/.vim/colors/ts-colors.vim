@@ -35,7 +35,6 @@ hi def link @preproc @comment
 hi def link @markup.raw @comment
 
 " Nothings
-hi def link @conditional @none
 hi def link @operator @none
 hi def link @variable @none
 hi def link @variable.member @none
@@ -43,6 +42,8 @@ hi def link @function @none
 hi def link @variable.tsx @none
 hi def link @function.method.call @none
 hi def link @punctuation.bracket @none
+hi def link @conditional.ternary @none
+hi def link @property @none
 
 
 hi def link @include @keyword
@@ -52,6 +53,8 @@ hi def link @exception @keyword
 hi def link @repeat @keyword
 hi def link @variable.builtin @keyword
 hi def link @keyword.type.typescript @keyword
+hi def link @conditional @keyword
+hi def link @type.qualifier @keyword
 
 hi def link @boolean @constant
 hi def link @constant.builtin @constant
@@ -62,7 +65,6 @@ hi def link @string.regexp @string
 
 hi def link @tag.attribute @tag
 hi def link @label @tag
-hi def link @property @tag
 hi def link @tag.builtin.tsx @tag
 
 " Markdown

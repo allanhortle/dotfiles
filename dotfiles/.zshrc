@@ -51,9 +51,13 @@ setopt pushd_ignore_dups
 [ "$HISTSIZE" -lt 50000 ] && HISTSIZE=50000
 [ "$SAVEHIST" -lt 10000 ] && SAVEHIST=10000
 
+# move the prompt to the bottom of the screen
+printf "\033[$LINES;1H"
+
 
 # fzf
 source <(fzf --zsh)
+
 
 #
 # Prompt
@@ -81,7 +85,7 @@ function main_prompt() {
 
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:*' check-for-changes true
-zstyle ':vcs_info:git*' formats "%b%m  "
+zstyle ':vcs_info:git*' formats "%m  "
 zstyle ':vcs_info:git*' actionformats "%a%b%m  "
 zstyle ':vcs_info:*+*:*' debug false
 zstyle ':vcs_info:git*+set-message:*' hooks git-extras
@@ -99,6 +103,11 @@ function git_changes() {
 }
 
 function +vi-git-extras(){
+    # Only show branch if it differs from current directory name
+    if [[ "${hook_com[branch]}" != "${PWD:t}" ]]; then
+        hook_com[misc]+="${hook_com[branch]}"
+    fi
+
     local changes=$(git status --short --branch -u 2> /dev/null);
     local staged=""
     local misc=""
@@ -250,6 +259,7 @@ alias grb='git rebase'
 alias grbc='git rebase --continue'
 alias grba='git rebase --abort'
 alias gmt='git mergetool'
+alias gwt='git worktree'
 alias gst='git status --short --branch'
 alias gs='git checkout $(gb | fzf --tac)'
 alias gbmd='gb --merged | rg -v "(\*|master)" | xargs git branch -d'
@@ -258,6 +268,13 @@ alias monofiles='git diff --name-only origin/master...'
 function git_fixup() {
     git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup | git rebase -i --autosquash $1
 }
+
+
+# Workmux
+alias wm='workmux'
+alias wma='workmux add'
+alias wmr='workmux remove'
+alias wml='workmux list'
 
 function branch_delete() {
   gb -vv | grep -Ev "master|\*" | fzf -m | awk '{print $1}' | xargs -I {} git branch -D '{}'
@@ -299,6 +316,39 @@ function prs() {
         | cut -d ' ' -f1 \
         | xargs -L 1 gh pr view --web
 }
+
+# watch a pr untill there are comments
+prwatch() {
+  local pr_url last_count current_count
+
+  pr_url=$(gh pr view --json url -q '.url' 2>/dev/null)
+  if [[ -z "$pr_url" ]]; then
+    echo "No PR found for current branch"
+    return 1
+  fi
+
+  echo "Watching for comments on: $pr_url"
+
+  last_count=$(gh pr view --json comments,reviews -q '([.comments // []] | length) + ([.reviews // []] | length)')
+
+   while true; do
+      sleep 10
+      current_count=$(gh pr view --json comments,reviews -q '([.comments // []] | length) + ([.reviews // []] |
+  length)')
+      current_decision=$(gh pr view --json reviewDecision -q '.reviewDecision')
+
+      if [[ "$current_decision" != "$last_decision" ]]; then
+        print "\a"
+        echo "Review status changed: $current_decision"
+        last_decision=$current_decision
+      elif (( current_count > last_count )); then
+        print "\a"
+        echo "New activity on PR! ($current_count comments/reviews)"
+        last_count=$current_count
+      fi
+    done
+}
+
 
 # data
 alias music="vd --quitguard ~/Dropbox/data/albums.csv"
@@ -374,6 +424,9 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 autoload bashcompinit && bashcompinit
 autoload -Uz compinit && compinit
 complete -C '/opt/homebrew/bin/aws_completer' aws
+
+# workmux
+eval "$(workmux completions zsh)"
 
 # Created by `pipx` on 2024-07-11 00:33:36
 export PATH="$PATH:/Users/allanhortle/.local/bin"

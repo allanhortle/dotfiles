@@ -1,0 +1,22 @@
+agent: claude
+window_prefix: ''
+files:
+  copy:
+    - packages/*/.env
+    - packages/*/.env.debug
+    - packages/*/.env.local
+    - packages/i18n/dist/
+    - packages/main/firebase.json
+    - firebase-config.json
+panes:
+  - command: clear
+  - split: horizontal
+    command: yarn install && gen
+  - command: <agent>
+    split: vertical
+    focus: true
+status_format: false
+#status_icons:
+  #working: "🤖"
+  #waiting: "💬"
+  #done: "✅"
