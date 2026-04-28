@@ -199,6 +199,7 @@ function any() {
     fi
 }
 
+
 function weather() {
     bom hobart -p "%t°C"
 }
@@ -273,8 +274,13 @@ function git_fixup() {
 # Workmux
 alias wm='workmux'
 alias wma='workmux add'
+alias wmd='workmux dashboard'
 alias wmr='workmux remove'
+alias wmo='workmux open'
+alias wmc='workmux close'
 alias wml='workmux list'
+alias {wmt,wmn}='workmux add -A -e'
+alias review='workmux add -p "/code-review" --pr'
 
 function branch_delete() {
   gb -vv | grep -Ev "master|\*" | fzf -m | awk '{print $1}' | xargs -I {} git branch -D '{}'
@@ -300,7 +306,7 @@ function pr-checkout() {
 
 # Github
 alias prm="gh pr list --author=@me --draft=false --json=url --jq '.[].url' | xargs -I {} open {}"
-alias {review,reviews,prr}="gh pr list -S 'is:open is:pr draft:false review-requested:@me' | cut -f1 | xargs -n1 -- gh pr view --web"
+#alias {review,reviews,prr}="gh pr list -S 'is:open is:pr draft:false review-requested:@me' | cut -f1 | xargs -n1 -- gh pr view --web"
 alias prc="gh pr create"
 alias changes="gh pr diff | delta -s"
 function checks() {
@@ -319,7 +325,7 @@ function prs() {
 
 # watch a pr untill there are comments
 prwatch() {
-  local pr_url last_count current_count
+  local pr_url last_count current_count last_decision current_decision
 
   pr_url=$(gh pr view --json url -q '.url' 2>/dev/null)
   if [[ -z "$pr_url" ]]; then
@@ -329,30 +335,32 @@ prwatch() {
 
   echo "Watching for comments on: $pr_url"
 
-  last_count=$(gh pr view --json comments,reviews -q '([.comments // []] | length) + ([.reviews // []] | length)')
+  last_count=$(gh pr view --json comments,reviews -q '([.comments // []] | length) + ([.reviews // [] | .[].comments // []] | flatten | length) + ([.reviews // []] | length)')
+  last_decision=$(gh pr view --json reviewDecision -q '.reviewDecision')
 
-   while true; do
-      sleep 10
-      current_count=$(gh pr view --json comments,reviews -q '([.comments // []] | length) + ([.reviews // []] |
-  length)')
-      current_decision=$(gh pr view --json reviewDecision -q '.reviewDecision')
+  while true; do
+    sleep 10
+    current_count=$(gh pr view --json comments,reviews -q '([.comments // []] | length) + ([.reviews // [] | .[].comments // []] | flatten | length) + ([.reviews // []] | length)')
+    current_decision=$(gh pr view --json reviewDecision -q '.reviewDecision')
 
-      if [[ "$current_decision" != "$last_decision" ]]; then
-        print "\a"
-        echo "Review status changed: $current_decision"
-        last_decision=$current_decision
-      elif (( current_count > last_count )); then
-        print "\a"
-        echo "New activity on PR! ($current_count comments/reviews)"
-        last_count=$current_count
-      fi
-    done
+    if [[ "$current_decision" != "$last_decision" ]]; then
+      print "\a"
+      echo "Review status changed: $current_decision"
+      last_decision=$current_decision
+    elif (( current_count > last_count )); then
+      print "\a"
+      echo "New activity on PR! ($current_count comments/reviews)"
+      last_count=$current_count
+    fi
+  done
 }
+
 
 
 # data
 alias music="vd --quitguard ~/Dropbox/data/albums.csv"
 alias notes='vim ~/Dropbox/work/notes.md'
+alias random_letter="cat /dev/urandom | LC_ALL=C tr -dc 'a-z' | fold -w 1 | head -n 1"
 
 function links() {
     gum spin --title "Fetching Raindrops" --show-output -- http -A bearer -a $RAINDROP_TOKEN GET https://api.raindrop.io/rest/v1/raindrops/0\?perpage=40\
@@ -381,6 +389,7 @@ alias tmn='tmux new'
 # zsh
 alias zr=". ~/.zshrc"
 alias k='kill -9'
+alias fk="ps -e | fzf | awk '{print $1}' | xargs kill"
 alias l='ls -lFha' 
 alias vim='nvim'
 alias -- -='cd -'

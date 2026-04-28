@@ -155,7 +155,7 @@ hi DiffText ctermfg=blue ctermbg=NONE cterm=NONE
 "
 " markdown
 hi markdownBold cterm=bold
-hi markdownCode ctermfg=red
+hi markdownCode ctermfg=green
 hi markdownCodeDelimiter ctermfg=242
 hi markdownCodeBlock ctermfg=242
 hi markdownH1 ctermfg=yellow

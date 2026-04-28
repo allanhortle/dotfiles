@@ -169,6 +169,16 @@ autocmd! User GoyoLeave call <SID>goyo_leave()
 
 
 " fzf
+function! s:fzf_statusline()
+  setlocal statusline=%#Normal#
+endfunction
+autocmd! User FzfStatusLine call <SID>fzf_statusline()
+
+func! s:insert_file_name(lines)
+  let @@ = fnamemodify(a:lines[0], ":p")
+  normal! p
+endfunc
+
 let g:fzf_vim = {}
 let g:fzf_vim.files_options = '--style minimal'
 let g:fzf_vim.buffers_options = '--style minimal'
@@ -184,23 +194,22 @@ let g:fzf_colors = {
 \ 'info':    ['fg', '@comment'],
 \ 'prompt':  ['fg', '@comment'],
 \}
+let g:fzf_action = {
+\ 'ctrl-p': ':r !echo',
+\ 'ctrl-r': function('s:insert_file_name')
+\}
 
 command! -bang -nargs=? -complete=dir Files call fzf#vim#files(<q-args>, {'options': ['-i']}, <bang>0)
-
-function! s:fzf_statusline()
-  setlocal statusline=%#Normal#
-endfunction
-autocmd! User FzfStatusLine call <SID>fzf_statusline()
 
 
 " Startify
 let g:startify_change_to_dir = 0
 let g:startify_lists = [
-    \ { 'type': 'dir',       'header': ['   MRU '. getcwd()] },
-    \ { 'type': 'files',     'header': ['   MRU']            },
-    \ { 'type': 'bookmarks', 'header': ['   Bookmarks']      },
-    \ { 'type': 'commands',  'header': ['   Commands']       },
-    \ ]
+\ { 'type': 'dir',       'header': ['   MRU '. getcwd()] },
+\ { 'type': 'files',     'header': ['   MRU']            },
+\ { 'type': 'bookmarks', 'header': ['   Bookmarks']      },
+\ { 'type': 'commands',  'header': ['   Commands']       },
+\ ]
 
 " ctrlsf
 let g:ctrlsf_auto_focus = { "at": "start" }
