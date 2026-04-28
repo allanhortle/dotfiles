@@ -9,10 +9,13 @@ else
     brew update
 fi
 
-brew bundle 
+brew bundle
 stow dotfiles --no-folding
 source ~/.zshrc
 fnm install --latest
+
+# Build tree-sitter parsers (replaces nvim-treesitter :TSUpdate)
+./extras/install-parsers.sh
 
 # Hide everthing from the dock
 defaults write "com.apple.dock" "persistent-apps" -array

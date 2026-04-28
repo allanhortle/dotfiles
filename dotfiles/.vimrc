@@ -43,8 +43,6 @@ Plug 'tweekmonster/startuptime.vim'
 Plug 'arthurxavierx/vim-caser'
 
 " Neovim
-Plug 'nvim-treesitter/nvim-treesitter', {'tag': 'v0.9.2', 'do': ':TSUpdate'}
-Plug 'nvim-treesitter/playground'
 Plug 'David-Kunz/treesitter-unit'
 Plug 'echasnovski/mini.surround'
 Plug 'dmmulroy/tsc.nvim'
@@ -106,7 +104,7 @@ set writebackup                 " protect against crash-during-write
 
 " Treesiter folding
 set foldmethod=expr
-set foldexpr=nvim_treesitter#foldexpr()
+set foldexpr=v:lua.vim.treesitter.foldexpr()
 set nofoldenable                     " Disable folding at startup.
 
 " Vim only settings
@@ -375,7 +373,7 @@ nnoremap <Leader>s :Startify<CR>
 nnoremap <Leader>u :UndotreeToggle<CR>
 nnoremap <Leader>v :e $MYVIMRC<CR>
 nnoremap <Leader>h :History<CR>
-nnoremap <Leader>j :TSHighlightCapturesUnderCursor<CR>
+nnoremap <Leader>j :Inspect<CR>
 
 " tig
 nnoremap <Leader>tt :Tig<CR>

@@ -1,2 +1,3 @@
 .DS_Store
 Brewfile.lock.json
+dotfiles/.config/nvim/parser/

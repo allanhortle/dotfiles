@@ -1,33 +1,11 @@
-require('nvim-treesitter.configs').setup {
-  ensure_installed = {
-    "bash",
-    "css",
-    "csv",
-    "diff",
-    "dockerfile",
-    "gdscript",
-    "git_config",
-    "git_rebase",
-    "gitattributes",
-    "graphql",
-    "html",
-    "javascript",
-    "json",
-    "jsonc",
-    "lua",
-    "prisma",
-    "python",
-    "sql",
-    "tsx",
-    "typescript",
-    "vim",
-    "yaml"
-  },
-  highlight = {
-    enable = true,
-    additional_vim_regex_highlighting = true
-  }
-}
+vim.api.nvim_create_autocmd('FileType', {
+  callback = function(args)
+    local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
+    if lang and pcall(vim.treesitter.language.add, lang) then
+      pcall(vim.treesitter.start, args.buf, lang)
+    end
+  end,
+})
 
 require('mini.surround').setup()
 require('tsc').setup()
