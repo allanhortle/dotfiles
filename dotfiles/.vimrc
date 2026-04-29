@@ -167,10 +167,14 @@ autocmd! User GoyoLeave call <SID>goyo_leave()
 
 
 " fzf
-function! s:fzf_statusline()
-  setlocal statusline=%#Normal#
+function! s:fzf_open() abort
+  set laststatus=0 noshowmode noruler
+  autocmd BufLeave <buffer> set laststatus=2 showmode ruler
 endfunction
-autocmd! User FzfStatusLine call <SID>fzf_statusline()
+augroup FzfHideStatus
+  autocmd!
+  autocmd FileType fzf call s:fzf_open()
+augroup END
 
 func! s:insert_file_name(lines)
   let @@ = fnamemodify(a:lines[0], ":p")
@@ -193,6 +197,9 @@ let g:fzf_colors = {
 \ 'prompt':  ['fg', '@comment'],
 \}
 let g:fzf_action = {
+\ 'ctrl-t': 'tab split',
+\ 'ctrl-x': 'split',
+\ 'ctrl-v': 'vsplit',
 \ 'ctrl-p': ':r !echo',
 \ 'ctrl-r': function('s:insert_file_name')
 \}
