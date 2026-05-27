@@ -1,0 +1,26 @@
+# Theme
+config-file = themes/ayu
+
+# Window
+window-padding-x = 8
+window-padding-y = 4
+window-padding-balance = true
+fullscreen = true
+macos-non-native-fullscreen = true
+confirm-close-surface = false
+macos-window-shadow = false
+
+# Font
+font-family = CommitMono
+font-size = 14
+font-thicken = true
+font-thicken-strength = 200
+adjust-cell-width = 0
+adjust-cell-height = 1
+adjust-font-baseline = 1
+
+# Selection
+copy-on-select = clipboard
+
+# Keybindings
+keybind = f11=toggle_fullscreen

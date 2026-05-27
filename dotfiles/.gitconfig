@@ -56,4 +56,5 @@
 
 [advice]
     addEmptyPathspec = false
-
+[url "git@tactiq:Tactiq-HQ/"]
+	pushInsteadOf = git@github.com:Tactiq-HQ/

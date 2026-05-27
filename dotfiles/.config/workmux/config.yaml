@@ -14,16 +14,27 @@ sandbox:
   env_passthrough:
     - GITHUB_TOKEN
     - OPENAI_API_KEY
-    #- ANTHROPIC_API_KEY
+  container: 
+    runtime: apple-container
   extra_mounts:
     - ~/.pi/agent/skills
-  backend: lima
-  lima:
-    provision: |
-      sudo apt-get install -y ripgrep jq unzip gh
-      curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-      sudo apt-get install -y nodejs
-      sudo npm install -g @mariozechner/pi-coding-agent
+    - ~/.claude
+    #- host_path: /tmp
+      #guest_path: /tmp
+      #writeable: true
+
+
+# Lima Config
+    #- ANTHROPIC_API_KEY
+  #extra_mounts:
+    #- ~/.pi/agent/skills
+  #backend: lima
+  #lima:
+    #provision: |
+      #sudo apt-get install -y ripgrep jq unzip gh
+      #curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+      #sudo apt-get install -y nodejs
+      #sudo npm install -g @mariozechner/pi-coding-agent
 
 panes:
   - command: clear

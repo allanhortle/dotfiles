@@ -17,6 +17,9 @@ fnm install --latest
 # Build tree-sitter parsers (replaces nvim-treesitter :TSUpdate)
 ./extras/install-parsers.sh
 
+# Disable macOS font smoothing for ghostty (sharper text, matches alacritty)
+defaults write com.mitchellh.ghostty AppleFontSmoothing -int 0
+
 # Hide everthing from the dock
 defaults write "com.apple.dock" "persistent-apps" -array
 

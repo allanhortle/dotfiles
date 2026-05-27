@@ -313,7 +313,7 @@ nnoremap <C-L> :execute 'CocCommand explorer ' . expand('%:h')<CR>
 xmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
 nmap <leader>a  <Plug>(coc-codeaction-selected)<CR>
 
-nmap <leader>as  <Plug>(coc-codeaction-source)
+"nmap <leader>as  <Plug>(coc-codeaction-source)
 
 " Run the Code Lens action on the current line.
 xmap <leader>x  <Plug>(coc-convert-snippet)

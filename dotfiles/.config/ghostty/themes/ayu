@@ -1,0 +1,22 @@
+background = #212733
+foreground = #d9d7ce
+
+# normal
+palette = 0=#1A1F28
+palette = 1=#f07178
+palette = 2=#bae67e
+palette = 3=#ffcc66
+palette = 4=#36a3d9
+palette = 5=#d4bfff
+palette = 6=#95e6cb
+palette = 7=#c7c7c7
+
+# bright
+palette = 8=#686868
+palette = 9=#f07178
+palette = 10=#bae67e
+palette = 11=#ffdf80
+palette = 12=#6871ff
+palette = 13=#ff77ff
+palette = 14=#a6fde1
+palette = 15=#ffffff

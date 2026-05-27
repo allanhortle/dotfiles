@@ -262,13 +262,19 @@ alias grba='git rebase --abort'
 alias gmt='git mergetool'
 alias gwt='git worktree'
 alias gst='git status --short --branch'
-alias gs='git checkout $(gb | fzf --tac)'
 alias gbmd='gb --merged | rg -v "(\*|master)" | xargs git branch -d'
 alias monodiff='git diff --name-only origin/master... | grep "packages" | sed "s/packages\/\([^\/]*\).*/\1/g" | uniq'
 alias monofiles='git diff --name-only origin/master...'
 function git_fixup() {
     git log -n 50 --pretty=format:'%h %s' --no-merges | fzf | cut -c -7 | xargs -o git commit --fixup | git rebase -i --autosquash $1
 }
+
+
+# Git Spice
+alias gs='git-spice'
+alias gsl='git-spice ls'
+alias gsu='git-spice up'
+alias gsd='git-spice down'
 
 
 # Workmux
@@ -322,40 +328,6 @@ function prs() {
         | cut -d ' ' -f1 \
         | xargs -L 1 gh pr view --web
 }
-
-# watch a pr untill there are comments
-prwatch() {
-  local pr_url last_count current_count last_decision current_decision
-
-  pr_url=$(gh pr view --json url -q '.url' 2>/dev/null)
-  if [[ -z "$pr_url" ]]; then
-    echo "No PR found for current branch"
-    return 1
-  fi
-
-  echo "Watching for comments on: $pr_url"
-
-  last_count=$(gh pr view --json comments,reviews -q '([.comments // []] | length) + ([.reviews // [] | .[].comments // []] | flatten | length) + ([.reviews // []] | length)')
-  last_decision=$(gh pr view --json reviewDecision -q '.reviewDecision')
-
-  while true; do
-    sleep 10
-    current_count=$(gh pr view --json comments,reviews -q '([.comments // []] | length) + ([.reviews // [] | .[].comments // []] | flatten | length) + ([.reviews // []] | length)')
-    current_decision=$(gh pr view --json reviewDecision -q '.reviewDecision')
-
-    if [[ "$current_decision" != "$last_decision" ]]; then
-      print "\a"
-      echo "Review status changed: $current_decision"
-      last_decision=$current_decision
-    elif (( current_count > last_count )); then
-      print "\a"
-      echo "New activity on PR! ($current_count comments/reviews)"
-      last_count=$current_count
-    fi
-  done
-}
-
-
 
 # data
 alias music="vd --quitguard ~/Dropbox/data/albums.csv"
@@ -439,3 +411,23 @@ eval "$(workmux completions zsh)"
 
 # Created by `pipx` on 2024-07-11 00:33:36
 export PATH="$PATH:/Users/allanhortle/.local/bin"
+#compdef gt
+###-begin-gt-completions-###
+#
+# yargs command completion script
+#
+# Installation: gt completion >> ~/.zshrc
+#    or gt completion >> ~/.zprofile on OSX.
+#
+_gt_yargs_completions()
+{
+  local reply
+  local si=$IFS
+  IFS=$'
+' reply=($(COMP_CWORD="$((CURRENT-1))" COMP_LINE="$BUFFER" COMP_POINT="$CURSOR" gt --get-yargs-completions "${words[@]}"))
+  IFS=$si
+  _describe 'values' reply
+}
+compdef _gt_yargs_completions gt
+###-end-gt-completions-###
+

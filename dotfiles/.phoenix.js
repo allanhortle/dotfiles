@@ -10,8 +10,8 @@ function bindApp(name, key) {
   });
 }
 
-bindApp('Alacritty', 'escape');
-bindApp('Alacritty', '`');
+bindApp('Ghostty', 'escape');
+bindApp('Ghostty', '`');
 bindApp('Google Chrome', '1');
 bindApp('Slack', '2');
 bindApp('Linear', '3');

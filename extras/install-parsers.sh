@@ -33,6 +33,7 @@ GRAMMARS=(
   "tsx|https://github.com/tree-sitter/tree-sitter-typescript|master|tsx|parser.c scanner.c"
   "typescript|https://github.com/tree-sitter/tree-sitter-typescript|master|typescript|parser.c scanner.c"
   "yaml|https://github.com/ikatyang/tree-sitter-yaml|master||parser.c scanner.cc"
+  "zsh|https://github.com/georgeharker/tree-sitter-zsh|main||parser.c scanner.c"
 )
 
 build_one() {

@@ -32,7 +32,6 @@ hi Function ctermfg=white cterm=NONE
 
 " Tree Sitter
 hi def link @preproc @comment
-hi def link @markup.raw @comment
 
 " Nothings
 hi def link @operator @none
@@ -73,6 +72,8 @@ hi def link @markup.heading @tag
 hi def link @markup.heading.2 @tag
 hi def link @markup.heading.3 @tag
 hi def link @markup.link @constant
+hi def link @markup.raw.markdown_inline @constant
+hi def link @markup.raw.block @comment
 
 
 
@@ -110,7 +111,7 @@ hi Question ctermfg=white
 hi Search ctermbg=grey
 hi SignColumn ctermbg=NONE
 hi SpecialKey ctermfg=white
-hi SpellBad ctermfg=red ctermbg=NONE cterm=undercurl
+hi SpellBad cterm=undercurl
 hi SpellCap ctermfg=yellow ctermbg=NONE cterm=underline
 hi SpellLocal ctermfg=NONE ctermbg=NONE cterm=NONE
 hi TabLine ctermfg=NONE ctermbg=NONE cterm=NONE
@@ -154,7 +155,7 @@ hi DiffText ctermfg=blue ctermbg=NONE cterm=NONE
 
 "
 " markdown
-hi markdownBold cterm=bold
+hi @markup.strong cterm=bold
 hi markdownCode ctermfg=green
 hi markdownCodeDelimiter ctermfg=242
 hi markdownCodeBlock ctermfg=242

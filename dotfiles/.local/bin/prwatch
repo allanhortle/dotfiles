@@ -1,0 +1,197 @@
+#!/usr/bin/env zx
+// vim: set ft=javascript :
+$.verbose = false; // don't echo the gh commands we run
+
+if (argv.help || argv.h) {
+  console.log(
+    [
+      'prwatch — watch a PR’s state, checks, and conversation.',
+      '',
+      'Usage:',
+      '  prwatch                 # PR for current branch',
+      '  prwatch 1234            # PR #1234 in current repo',
+      '  prwatch owner/repo#1234 # PR in another repo',
+      '  prwatch <pr-url>',
+      '  prwatch -i 60           # poll every 60s (default 30)',
+      '  prwatch --once          # print one snapshot and exit',
+    ].join('\n'),
+  );
+  process.exit(0);
+}
+
+const interval = Number(argv.i ?? argv.interval ?? 30);
+const once = Boolean(argv.once);
+const prArg = argv._[0] ? String(argv._[0]) : '';
+
+const JSON_FIELDS =
+  'number,url,title,state,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup,headRefName,baseRefName,isDraft,id';
+
+const FAIL_STATES = new Set([
+  'FAILURE',
+  'TIMED_OUT',
+  'CANCELLED',
+  'ACTION_REQUIRED',
+  'STARTUP_FAILURE',
+  'ERROR',
+]);
+
+async function fetchPr() {
+  const args = ['pr', 'view'];
+  if (prArg) args.push(prArg);
+  args.push('--json', JSON_FIELDS);
+  const out = await $`gh ${args}`.nothrow();
+  return out.exitCode === 0 ? out.json() : null;
+}
+
+async function fetchUnresolvedCount(prId) {
+  const query = `
+    query($id: ID!) {
+      node(id: $id) {
+        ... on PullRequest {
+          reviewThreads(first: 100) {
+            nodes { isResolved }
+          }
+        }
+      }
+    }`;
+  const out = await $`gh api graphql -f query=${query} -f id=${prId}`.nothrow();
+  if (out.exitCode !== 0) return null;
+  const nodes = out.json()?.data?.node?.reviewThreads?.nodes ?? [];
+  return nodes.filter((n) => !n.isResolved).length;
+}
+
+function ring() {
+  process.stdout.write('\x07');
+}
+
+function deriveStatus({state, mergeable, mergeStatus, decision, isDraft, checksFail, checksPending}) {
+  if (state === 'MERGED') return 'MERGED';
+  if (state === 'CLOSED') return 'CLOSED';
+  if (isDraft) return 'DRAFT';
+  if (mergeable === 'CONFLICTING') return 'CONFLICT';
+  switch (mergeStatus) {
+    case 'CLEAN':
+    case 'BEHIND':
+    case 'HAS_HOOKS':
+      return 'READY';
+    case 'UNSTABLE':
+      return 'UNSTABLE';
+    case 'DIRTY':
+      return 'CONFLICT';
+    case 'DRAFT':
+      return 'DRAFT';
+    case 'BLOCKED':
+      if (decision === 'REVIEW_REQUIRED' || decision === 'CHANGES_REQUESTED') return 'BLOCKED:review';
+      if (checksFail > 0 || checksPending > 0) return 'BLOCKED:checks';
+      return 'BLOCKED';
+    default:
+      return 'UNKNOWN';
+  }
+}
+
+function colorizeStatus(s) {
+  if (s === 'READY') return chalk.green(s);
+  if (s === 'MERGED') return chalk.blue(s);
+  if (s === 'CLOSED' || s === 'CONFLICT') return chalk.red(s);
+  if (s === 'DRAFT' || s === 'UNKNOWN') return chalk.dim(s);
+  if (s === 'UNSTABLE' || s.startsWith('BLOCKED')) return chalk.yellow(s);
+  return s;
+}
+
+const initial = await fetchPr();
+if (!initial) {
+  console.error('No PR found.');
+  process.exit(1);
+}
+
+const {id: prId, title, url, headRefName, baseRefName, isDraft} = initial;
+
+console.log(chalk.bold(title));
+console.log(chalk.dim(`${headRefName} → ${baseRefName}${isDraft ? '  (draft)' : ''}`));
+console.log(chalk.dim(url));
+
+let prevStatus = '';
+let prevUnresolved = -1;
+let prevFailedChecks = '';
+let data = initial;
+let first = true;
+
+while (true) {
+  if (!first) {
+    await sleep(interval * 1000);
+    const next = await fetchPr();
+    if (!next) {
+      console.log(`${chalk.dim(new Date().toLocaleTimeString())}  ${chalk.yellow('fetch failed')}`);
+      continue;
+    }
+    data = next;
+  }
+  first = false;
+
+  const state = data.state;
+  const mergeable = data.mergeable ?? 'UNKNOWN';
+  const mergeStatus = data.mergeStateStatus ?? 'UNKNOWN';
+  const decision = data.reviewDecision || 'NONE';
+
+  let unresolved = await fetchUnresolvedCount(prId);
+  if (unresolved == null) unresolved = prevUnresolved;
+
+  const rollup = data.statusCheckRollup ?? [];
+  const stateOf = (c) => c.conclusion ?? c.state;
+  const checksPass = rollup.filter((c) => stateOf(c) === 'SUCCESS').length;
+  const failing = rollup.filter((c) => FAIL_STATES.has(stateOf(c)));
+  const checksFail = failing.length;
+  const checksPending = rollup.length - checksPass - checksFail;
+  const failedChecks = [...new Set(failing.map((c) => c.name ?? c.context ?? '?'))].sort().join(', ');
+
+  const prStatus = deriveStatus({state, mergeable, mergeStatus, decision, isDraft, checksFail, checksPending});
+  const statusC = colorizeStatus(prStatus);
+
+  let checksC;
+  if (checksFail > 0) {
+    checksC = `${chalk.green(checksPass)}|${chalk.red(checksFail)}|${chalk.yellow(checksPending)}`;
+  } else if (checksPending > 0) {
+    checksC = `${chalk.green(checksPass)}|${chalk.yellow(checksPending)}`;
+  } else {
+    checksC = chalk.green(checksPass);
+  }
+
+  const unresolvedC = unresolved > 0 ? chalk.yellow(unresolved) : chalk.green(0);
+  const ts = new Date().toLocaleTimeString();
+  console.log(`${chalk.dim(ts)} ${statusC} checks=${checksC} unresolved=${unresolvedC}`);
+
+  let bell = false;
+  if (prevStatus) {
+    if (prStatus !== prevStatus) {
+      console.log(`→ ${prevStatus} → ${prStatus}`);
+      bell = true;
+    }
+    if (unresolved !== prevUnresolved) {
+      if (unresolved > prevUnresolved) {
+        console.log(`→ +${unresolved - prevUnresolved} unresolved comment(s) (now ${unresolved})`);
+      } else {
+        console.log(`→ ${prevUnresolved - unresolved} resolved (now ${unresolved})`);
+      }
+      bell = true;
+    }
+    if (failedChecks !== prevFailedChecks && failedChecks) {
+      console.log(`→ failing: ${chalk.red(failedChecks)}`);
+      bell = true;
+    }
+  }
+  if (bell) ring();
+
+  prevStatus = prStatus;
+  prevUnresolved = unresolved;
+  prevFailedChecks = failedChecks;
+
+  if (state === 'MERGED' || state === 'CLOSED') {
+    console.log();
+    console.log(`PR is ${state} — exiting.`);
+    ring();
+    process.exit(0);
+  }
+
+  if (once) process.exit(0);
+}
+
