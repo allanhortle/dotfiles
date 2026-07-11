@@ -29,10 +29,16 @@ const JSON_FIELDS =
 const FAIL_STATES = new Set([
   'FAILURE',
   'TIMED_OUT',
-  'CANCELLED',
+  //'CANCELLED',
   'ACTION_REQUIRED',
   'STARTUP_FAILURE',
   'ERROR',
+]);
+
+const GREEN_STATES = new Set([
+  'SUCCESS',
+  'SKIPPED',
+  'CANCELLED',
 ]);
 
 async function fetchPr() {
@@ -43,11 +49,13 @@ async function fetchPr() {
   return out.exitCode === 0 ? out.json() : null;
 }
 
-async function fetchUnresolvedCount(prId) {
+async function fetchNode(prId) {
   const query = `
     query($id: ID!) {
       node(id: $id) {
         ... on PullRequest {
+          isInMergeQueue
+          mergeQueueEntry { position state }
           reviewThreads(first: 100) {
             nodes { isResolved }
           }
@@ -56,18 +64,25 @@ async function fetchUnresolvedCount(prId) {
     }`;
   const out = await $`gh api graphql -f query=${query} -f id=${prId}`.nothrow();
   if (out.exitCode !== 0) return null;
-  const nodes = out.json()?.data?.node?.reviewThreads?.nodes ?? [];
-  return nodes.filter((n) => !n.isResolved).length;
+  const node = out.json()?.data?.node;
+  if (!node) return null;
+  const nodes = node.reviewThreads?.nodes ?? [];
+  return {
+    unresolved: nodes.filter((n) => !n.isResolved).length,
+    inQueue: Boolean(node.isInMergeQueue),
+    queuePosition: node.mergeQueueEntry?.position ?? null,
+  };
 }
 
 function ring() {
   process.stdout.write('\x07');
 }
 
-function deriveStatus({state, mergeable, mergeStatus, decision, isDraft, checksFail, checksPending}) {
+function deriveStatus({state, mergeable, mergeStatus, decision, isDraft, checksFail, checksPending, inQueue}) {
   if (state === 'MERGED') return 'MERGED';
   if (state === 'CLOSED') return 'CLOSED';
   if (isDraft) return 'DRAFT';
+  if (inQueue) return 'QUEUED';
   if (mergeable === 'CONFLICTING') return 'CONFLICT';
   switch (mergeStatus) {
     case 'CLEAN':
@@ -92,9 +107,10 @@ function deriveStatus({state, mergeable, mergeStatus, decision, isDraft, checksF
 function colorizeStatus(s) {
   if (s === 'READY') return chalk.green(s);
   if (s === 'MERGED') return chalk.blue(s);
+  if (s.startsWith('QUEUED')) return chalk.yellow(s);
   if (s === 'CLOSED' || s === 'CONFLICT') return chalk.red(s);
   if (s === 'DRAFT' || s === 'UNKNOWN') return chalk.dim(s);
-  if (s === 'UNSTABLE' || s.startsWith('BLOCKED')) return chalk.yellow(s);
+  if (s === 'UNSTABLE' || s.startsWith('BLOCKED')) return chalk.red(s);
   return s;
 }
 
@@ -104,11 +120,12 @@ if (!initial) {
   process.exit(1);
 }
 
-const {id: prId, title, url, headRefName, baseRefName, isDraft} = initial;
+const {id: prId, title, url, headRefName, baseRefName, isDraft, number} = initial;
 
 console.log(chalk.bold(title));
 console.log(chalk.dim(`${headRefName} → ${baseRefName}${isDraft ? '  (draft)' : ''}`));
 console.log(chalk.dim(url));
+console.log(chalk.dim(`https://app.graphite.com/github/pr/Tactiq-HQ/main/${number}`));
 
 let prevStatus = '';
 let prevUnresolved = -1;
@@ -133,53 +150,45 @@ while (true) {
   const mergeStatus = data.mergeStateStatus ?? 'UNKNOWN';
   const decision = data.reviewDecision || 'NONE';
 
-  let unresolved = await fetchUnresolvedCount(prId);
-  if (unresolved == null) unresolved = prevUnresolved;
+  //console.log(data);
+
+  const node = await fetchNode(prId);
+  let unresolved = node?.unresolved ?? prevUnresolved;
+  const inQueue = node?.inQueue ?? false;
+  const queuePosition = node?.queuePosition ?? null;
 
   const rollup = data.statusCheckRollup ?? [];
   const stateOf = (c) => c.conclusion ?? c.state;
-  const checksPass = rollup.filter((c) => stateOf(c) === 'SUCCESS').length;
+  const checksPass = rollup.filter((c) => GREEN_STATES.has(stateOf(c))).length;
+
   const failing = rollup.filter((c) => FAIL_STATES.has(stateOf(c)));
   const checksFail = failing.length;
   const checksPending = rollup.length - checksPass - checksFail;
   const failedChecks = [...new Set(failing.map((c) => c.name ?? c.context ?? '?'))].sort().join(', ');
 
-  const prStatus = deriveStatus({state, mergeable, mergeStatus, decision, isDraft, checksFail, checksPending});
-  const statusC = colorizeStatus(prStatus);
+  //console.log(rollup.filter((c) => stateOf(c) !== 'SUCCESS' && stateOf(c) !== 'SKIPPED'));
+
+  const prStatus = deriveStatus({state, mergeable, mergeStatus, decision, isDraft, checksFail, checksPending, inQueue});
+  const statusC = prStatus === 'QUEUED' && queuePosition != null
+    ? colorizeStatus(`${prStatus}#${queuePosition}`)
+    : colorizeStatus(prStatus);
 
   let checksC;
   if (checksFail > 0) {
-    checksC = `${chalk.green(checksPass)}|${chalk.red(checksFail)}|${chalk.yellow(checksPending)}`;
+    checksC = `${chalk.red(`⨯${checksFail}`)}`;
   } else if (checksPending > 0) {
-    checksC = `${chalk.green(checksPass)}|${chalk.yellow(checksPending)}`;
+    checksC = `${chalk.yellow(checksPending.toString().padStart(2, ' '))}:${chalk.green(checksPass)}`;
   } else {
     checksC = chalk.green(checksPass);
   }
 
-  const unresolvedC = unresolved > 0 ? chalk.yellow(unresolved) : chalk.green(0);
+  const unresolvedC = chalk[unresolved > 0 ? 'red' : 'green'](`•${unresolved}`);
   const ts = new Date().toLocaleTimeString();
-  console.log(`${chalk.dim(ts)} ${statusC} checks=${checksC} unresolved=${unresolvedC}`);
+  console.log(`${chalk.dim(ts)} ${checksC} ${unresolvedC} ${statusC} `);
 
-  let bell = false;
-  if (prevStatus) {
-    if (prStatus !== prevStatus) {
-      console.log(`→ ${prevStatus} → ${prStatus}`);
-      bell = true;
-    }
-    if (unresolved !== prevUnresolved) {
-      if (unresolved > prevUnresolved) {
-        console.log(`→ +${unresolved - prevUnresolved} unresolved comment(s) (now ${unresolved})`);
-      } else {
-        console.log(`→ ${prevUnresolved - unresolved} resolved (now ${unresolved})`);
-      }
-      bell = true;
-    }
-    if (failedChecks !== prevFailedChecks && failedChecks) {
-      console.log(`→ failing: ${chalk.red(failedChecks)}`);
-      bell = true;
-    }
+  if (prevStatus && prStatus !== 'UNKNOWN' && prevStatus !== 'UNKNOWN' && prStatus !== prevStatus) {
+    ring();
   }
-  if (bell) ring();
 
   prevStatus = prStatus;
   prevUnresolved = unresolved;

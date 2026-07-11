@@ -177,6 +177,10 @@ export HOMEBREW_NO_INSTALL_UPGRADE=1
 export GPG_TTY=$(tty)
 
 
+# claude and tmux fighting
+#export CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN=1
+
+
 #
 # Functions
 #
@@ -286,7 +290,10 @@ alias wmo='workmux open'
 alias wmc='workmux close'
 alias wml='workmux list'
 alias {wmt,wmn}='workmux add -A -e'
-alias review='workmux add -p "/code-review" --pr'
+
+function review() {
+  workmux add -p "/code-review ${@:2}" --pr $1
+}
 
 function branch_delete() {
   gb -vv | grep -Ev "master|\*" | fzf -m | awk '{print $1}' | xargs -I {} git branch -D '{}'
@@ -382,8 +389,6 @@ function saycode() {
         say "failure"
     fi
 }
-alias floater="alacritty -o \"window.decorations='Full'\" -o \"window.startup_mode='Windowed'\""
-
 
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
@@ -394,8 +399,6 @@ if [ -f ~/.zshrc.local ]; then
 fi
 
 
-
-
 # bun 
 [ -s "/Users/allanhortle/.bun/_bun" ] && source "/Users/allanhortle/.bun/_bun"
 export BUN_INSTALL="$HOME/.bun"
@@ -404,30 +407,5 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 autoload bashcompinit && bashcompinit
 autoload -Uz compinit && compinit
-complete -C '/opt/homebrew/bin/aws_completer' aws
 
-# workmux
-eval "$(workmux completions zsh)"
-
-# Created by `pipx` on 2024-07-11 00:33:36
-export PATH="$PATH:/Users/allanhortle/.local/bin"
-#compdef gt
-###-begin-gt-completions-###
-#
-# yargs command completion script
-#
-# Installation: gt completion >> ~/.zshrc
-#    or gt completion >> ~/.zprofile on OSX.
-#
-_gt_yargs_completions()
-{
-  local reply
-  local si=$IFS
-  IFS=$'
-' reply=($(COMP_CWORD="$((CURRENT-1))" COMP_LINE="$BUFFER" COMP_POINT="$CURSOR" gt --get-yargs-completions "${words[@]}"))
-  IFS=$si
-  _describe 'values' reply
-}
-compdef _gt_yargs_completions gt
-###-end-gt-completions-###
 

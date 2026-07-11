@@ -39,7 +39,7 @@ sandbox:
 panes:
   - command: clear
   - split: horizontal
-    command: yarn install && gen
+    command: tail -f /tmp/setup-worktree-*.log
   - command: <agent>
     split: vertical
     focus: true
@@ -50,15 +50,24 @@ status_icons:
   waiting: "..."
   done: "✔"
 auto_name:
-  #command: claude -p
+  model: gemini-2.5-flash-lite
   system_prompt: |
-    Generate a concise git branch name based on the task description.
+    You output a single git branch name. Nothing else.
+
+    Your ENTIRE response must be one line: the branch name. Do not think out
+    loud, restate the task, explain your choice, or add any preamble, quotes,
+    punctuation, or trailing text. The first and only thing you write is the
+    branch name itself.
 
     Rules:
-    - Use kebab-case (lowercase with hyphens)
-    - Keep it short: 1-3 words, max 4 if necessary
-    - Focus on the core task/feature, not implementation details
-    - No prefixes like feat/, fix/, chore/
-    - if the prompt is a linear dump prefix the branch name with a lower case Identifier (hoth-123-short-title, prod-123-short-title)
+    - kebab-case (lowercase, hyphen-separated)
+    - 2-4 words, 40 characters MAX (hard limit)
+    - name the core task/feature, not the implementation details
+    - no feat/, fix/, chore/ prefixes
+    - if the prompt is a Linear dump, prefix with the lowercase identifier:
+      hoth-123-short-title, prod-456-short-title
 
-    Output ONLY the branch name, nothing else.
+    Examples:
+    Task: "I need permission to read that file. Once you grant it I can examine
+    the workmux config and help shorten the auto-naming prompt." -> shorten-auto-name-prompt
+    Task: "PROD-5259 build a team reporting page for admins" -> prod-5259-team-reporting
