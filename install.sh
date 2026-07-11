@@ -23,14 +23,5 @@ defaults write com.mitchellh.ghostty AppleFontSmoothing -int 0
 # Hide everthing from the dock
 defaults write "com.apple.dock" "persistent-apps" -array
 
-# turn off natural scroll
-defaults -currentHost write -g com.apple.swipescrolldirection -bool false
-
-# Remap capslock to control on the default keyboard
-defaults -currentHost write -g com.apple.keyboard.modifiermapping '({                                                                
-    HIDKeyboardModifierMappingDst = 30064771300;
-    HIDKeyboardModifierMappingSrc = 30064771129;
-})'
-
 killall Dock
 
