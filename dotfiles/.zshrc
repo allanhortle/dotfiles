@@ -360,6 +360,8 @@ alias npm_minor_publish='npm version minor && git push --follow-tags && npm publ
 alias t='tig'
 alias tst='tig status'
 
+alias hl='hledger'
+
 # tmux
 alias tmrw='tmux rename-window'
 alias tmrs='tmux rename-session'

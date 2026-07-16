@@ -4,6 +4,9 @@
 	"workspace.rootPatterns": ["package.json", ".git"],
 	"coc.source.dictionary.filetypes": ["markdown"],
 	"coc.source.word.filetypes": ["markdown"],
+	"editor.codeActionsOnSave": {
+		"source.organizeImports.biome": "always"
+	},
 	"snippets.priority": 1,
 	"snippets.loadFromExtensions": false,
 	"explorer.file.showHiddenFiles": true,
@@ -29,9 +32,14 @@
 	"tailwindCSS.experimental.classRegex": [
 		["([\"'`][^\"'`]*.*?[\"'`])", "[\"'`]([^\"'`]*).*?[\"'`]"]
 	],
-	"prettier.disableLanguages": ["markdown"],
-	"prettier.enable": false,
 	"biome.enable": true,
-	"biome.requireConfiguration": true,
-	"json.format.enable": false
+	"biome.requireConfiguration": false,
+	"json.format.enable": false,
+    "languageserver": {
+      "hledger": {
+        "command": "hledger-lsp",
+        "trace.server": "verbose",
+        "filetypes": [ "hledger", "journal", "ledger"]
+      }
+    }
 }
