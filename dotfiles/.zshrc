@@ -174,6 +174,7 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git"'
 export FZF_DEFAULT_OPTS='--color=16,bg+:-1,pointer:2,prompt:2,hl+:2,hl:2,fg+:2'
 export EDITOR="/opt/homebrew/bin/nvim"
 export HOMEBREW_NO_INSTALL_UPGRADE=1
+export HOMEBREW_NO_ENV_HINTS=1
 export GPG_TTY=$(tty)
 
 
@@ -410,9 +411,10 @@ fi
 
 
 # bun 
-[ -s "/Users/allanhortle/.bun/_bun" ] && source "/Users/allanhortle/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 
 
 autoload bashcompinit && bashcompinit
@@ -420,7 +422,7 @@ autoload -Uz compinit && compinit
 
 
 # pnpm
-export PNPM_HOME="/Users/allan/Library/pnpm"
+export PNPM_HOME="/Users/$HOME/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME/bin:"*) ;;
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
