@@ -418,3 +418,11 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 autoload bashcompinit && bashcompinit
 autoload -Uz compinit && compinit
 
+
+# pnpm
+export PNPM_HOME="/Users/allan/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end
