@@ -1,7 +1,7 @@
 agent: claude
-window_prefix: ''
+window_prefix: ""
 pre_remove:
-    - yarn stack down || true
+  - yarn stack down || true
 files:
   copy:
     - packages/*/.env
@@ -23,7 +23,7 @@ status_format: false
 status_icons:
   working: "~"
   waiting: "?"
-  done: ""
+  done: "•"
 auto_name:
   model: haiku
   system_prompt: |

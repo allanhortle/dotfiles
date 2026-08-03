@@ -2,25 +2,25 @@
 // vim: set ft=javascript :
 $.verbose = false; // don't echo the gh/tmux/git commands we run
 
-import os from 'node:os';
-import {spawn} from 'node:child_process';
-import {fileURLToPath} from 'node:url';
+import os from "node:os";
+import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const HOME = os.homedir();
-const STATE_DIR = path.join(HOME, '.cache', 'prstatus');
-const STATE_FILE = path.join(STATE_DIR, 'state.json');
-const PID_FILE = path.join(STATE_DIR, 'daemon.pid');
-const LOG_FILE = path.join(STATE_DIR, 'daemon.log');
+const STATE_DIR = path.join(HOME, ".cache", "prstatus");
+const STATE_FILE = path.join(STATE_DIR, "state.json");
+const PID_FILE = path.join(STATE_DIR, "daemon.pid");
+const LOG_FILE = path.join(STATE_DIR, "daemon.log");
 
 // The letter, and the pull request number behind it. tmux only honours a
 // #[range=] marker written literally in the format option, but it will expand a
 // format inside the marker's argument, so the number rides in its own option
 // and .tmux.conf turns the letter into a clickable range.
-const LETTER_OPTION = '@pr';
-const NUMBER_OPTION = '@prnum';
+const LETTER_OPTION = "@pr";
+const NUMBER_OPTION = "@prnum";
 // Bump whenever a stored record changes shape, so an old cache is discarded
 // rather than rendered with fields the current code no longer sets.
-const STATE_VERSION = 2;
+const STATE_VERSION = 4;
 
 // A 304 on /notifications costs no rate limit, so the heartbeat can run at
 // GitHub's own advertised cadence. The aggregate query costs a point, so it
@@ -32,33 +32,55 @@ const RATE_LIMIT_FLOOR = 200;
 
 // Notifications never report a check going green, a base branch moving, or a
 // fresh conflict, which is why the idle backstop above is not optional.
-const NOTIFICATIONS_URL = 'https://api.github.com/notifications';
-const GRAPHQL_URL = 'https://api.github.com/graphql';
+const NOTIFICATIONS_URL = "https://api.github.com/notifications";
+const GRAPHQL_URL = "https://api.github.com/graphql";
 
-const FAIL_STATES = new Set(['FAILURE', 'TIMED_OUT', 'ACTION_REQUIRED', 'STARTUP_FAILURE', 'ERROR']);
+const FAIL_STATES = new Set([
+  "FAILURE",
+  "TIMED_OUT",
+  "ACTION_REQUIRED",
+  "STARTUP_FAILURE",
+  "ERROR",
+]);
 // CANCELLED is green on purpose. Restacking a graphite branch cancels its
 // in-flight runs, and GitHub's own rollup state calls that a FAILURE even
 // though no check failed.
-const GREEN_STATES = new Set(['SUCCESS', 'SKIPPED', 'NEUTRAL', 'CANCELLED']);
+const GREEN_STATES = new Set(["SUCCESS", "SKIPPED", "NEUTRAL", "CANCELLED"]);
 
-// One letter, distinct initial. Red means the merge is stopped, whatever the
-// reason: building, waiting on a reviewer, failing, conflicted, or changes
-// asked for. Everything else is not in the way.
-//   G good to merge   D draft   Q queued   M merged   X closed unmerged
-//   B building   W waiting on review   F failing   C conflict   R changes
+// Chromatic parks its UI statuses at PENDING once the build is done and a
+// person has to act — accept a baseline, or go collect approvals. Nothing is
+// running, so counting it as "building" hides it behind whatever genuinely is.
+// Matched on the description rather than the context name, because the very
+// same context is also, legitimately, PENDING while the build runs. An
+// unrecognised description therefore falls through to building, which is the
+// safe way round: a check we cannot read stays yellow instead of crying wolf.
+const AWAITING_DESCRIPTIONS = [
+  /^awaiting \d+ approval/i,
+  /must be accepted as baseline/i,
+];
+
+// One letter per pull request, and the colour says whose move it is: yellow a
+// machine's, blue a reviewer's, red mine, green nobody's, grey nothing to do.
+//   G ready   D draft   B building   Q queued   M merged   X closed unmerged
+//   W waiting on a reviewer (blue) or on me (red)
+//   F failing   C conflict   R changes requested   ? unknown
+//
+// WAITING_ME covers both a Chromatic baseline parked on my approval and a merge
+// GitHub will not let through, because a human being in the way is the whole of
+// what the letter has to say — which human does not change what I do next.
 const LABELS = {
-  READY: ['G', 'green'],
-  DRAFT_READY: ['D', 'colour242'],
-  PENDING: ['B', 'red'],
-  REVIEW: ['W', 'blue'],
-  BLOCKED: ['W', 'red'],
-  FAILING: ['F', 'red'],
-  CONFLICT: ['C', 'red'],
-  CHANGES: ['R', 'red'],
-  QUEUED: ['Q', 'yellow'],
-  MERGED: ['M', 'magenta'],
-  CLOSED: ['X', 'colour242'],
-  UNKNOWN: ['?', 'colour242'],
+  READY: ["G", "green"],
+  DRAFT: ["D", "colour242"],
+  BUILDING: ["B", "yellow"],
+  WAITING_REVIEW: ["W", "blue"],
+  WAITING_ME: ["W", "red"],
+  FAILING: ["F", "red"],
+  CONFLICT: ["C", "red"],
+  CHANGES_REQUESTED: ["R", "red"],
+  QUEUED: ["Q", "yellow"],
+  MERGED: ["M", "magenta"],
+  CLOSED: ["X", "colour242"],
+  UNKNOWN: ["?", "colour242"],
 };
 
 // How far back to look for merged and closed pull requests. A worktree usually
@@ -87,7 +109,7 @@ const PR_QUERY = `
       state
       contexts(first: 100) { nodes {
         ... on CheckRun { name conclusion status }
-        ... on StatusContext { context state }
+        ... on StatusContext { context state description }
       } }
     } } } }
   }`;
@@ -97,7 +119,14 @@ const PR_QUERY = `
 // ---------------------------------------------------------------------------
 
 function emptyState() {
-  return {version: STATE_VERSION, updatedAt: null, heartbeat: {}, rateLimit: null, prs: {}, windows: {}};
+  return {
+    version: STATE_VERSION,
+    updatedAt: null,
+    heartbeat: {},
+    rateLimit: null,
+    prs: {},
+    windows: {},
+  };
 }
 
 function readState() {
@@ -113,7 +142,7 @@ function readState() {
 function writeState(state) {
   fs.ensureDirSync(STATE_DIR);
   const tmp = `${STATE_FILE}.${process.pid}`;
-  fs.writeJsonSync(tmp, state, {spaces: 2});
+  fs.writeJsonSync(tmp, state, { spaces: 2 });
   fs.renameSync(tmp, STATE_FILE);
 }
 
@@ -126,50 +155,64 @@ let cachedToken = null;
 async function token() {
   if (cachedToken) return cachedToken;
   const out = await $`gh auth token`.nothrow();
-  if (out.exitCode !== 0) throw new Error('gh auth token failed — run `gh auth login`');
+  if (out.exitCode !== 0)
+    throw new Error("gh auth token failed — run `gh auth login`");
   cachedToken = out.stdout.trim();
   return cachedToken;
 }
 
 async function login() {
   const out = await $`gh api user -q .login`.nothrow();
-  if (out.exitCode !== 0) throw new Error('cannot resolve the current github login');
+  if (out.exitCode !== 0)
+    throw new Error("cannot resolve the current github login");
   return out.stdout.trim();
 }
 
 // Returns true when something in the notification feed moved. A 304 is free,
 // so this is the cheap half of the poll.
 async function heartbeatMoved(state) {
-  const headers = {Authorization: `Bearer ${await token()}`, Accept: 'application/vnd.github+json'};
-  if (state.heartbeat.lastModified) headers['If-Modified-Since'] = state.heartbeat.lastModified;
+  const headers = {
+    Authorization: `Bearer ${await token()}`,
+    Accept: "application/vnd.github+json",
+  };
+  if (state.heartbeat.lastModified)
+    headers["If-Modified-Since"] = state.heartbeat.lastModified;
 
-  const res = await fetch(NOTIFICATIONS_URL, {headers});
+  const res = await fetch(NOTIFICATIONS_URL, { headers });
   await res.text(); // release the socket
 
-  const pollInterval = Number(res.headers.get('x-poll-interval'));
-  if (Number.isFinite(pollInterval) && pollInterval > 0) state.heartbeat.pollSecs = pollInterval;
+  const pollInterval = Number(res.headers.get("x-poll-interval"));
+  if (Number.isFinite(pollInterval) && pollInterval > 0)
+    state.heartbeat.pollSecs = pollInterval;
 
   if (res.status === 304) return false;
   if (!res.ok) throw new Error(`notifications: HTTP ${res.status}`);
 
-  state.heartbeat.lastModified = res.headers.get('last-modified') ?? state.heartbeat.lastModified;
+  state.heartbeat.lastModified =
+    res.headers.get("last-modified") ?? state.heartbeat.lastModified;
   return true;
 }
 
 async function fetchPrs(author) {
-  const since = new Date(Date.now() - CLOSED_WINDOW_DAYS * 86400000).toISOString().slice(0, 10);
+  const since = new Date(Date.now() - CLOSED_WINDOW_DAYS * 86400000)
+    .toISOString()
+    .slice(0, 10);
   const variables = {
     qOpen: `is:pr is:open author:${author}`,
     qClosed: `is:pr is:closed author:${author} sort:updated-desc updated:>=${since}`,
   };
   const res = await fetch(GRAPHQL_URL, {
-    method: 'POST',
-    headers: {Authorization: `Bearer ${await token()}`, 'Content-Type': 'application/json'},
-    body: JSON.stringify({query: PR_QUERY, variables}),
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${await token()}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query: PR_QUERY, variables }),
   });
   if (!res.ok) throw new Error(`graphql: HTTP ${res.status}`);
   const body = await res.json();
-  if (body.errors?.length) throw new Error(`graphql: ${body.errors[0].message}`);
+  if (body.errors?.length)
+    throw new Error(`graphql: ${body.errors[0].message}`);
   return body.data;
 }
 
@@ -181,6 +224,16 @@ function checkState(context) {
   return context.conclusion ?? context.state ?? context.status ?? null;
 }
 
+function needsAPerson(context) {
+  const description = context.description ?? "";
+  return AWAITING_DESCRIPTIONS.some((pattern) => pattern.test(description));
+}
+
+const contextNames = (contexts) =>
+  [...new Set(contexts.map((c) => c.name ?? c.context ?? "?"))].sort((a, b) =>
+    a.localeCompare(b),
+  );
+
 function summariseChecks(node) {
   const rollup = node.commits?.nodes?.[0]?.commit?.statusCheckRollup ?? null;
   const contexts = rollup?.contexts?.nodes ?? [];
@@ -188,16 +241,32 @@ function summariseChecks(node) {
   if (contexts.length === 0) {
     // Nothing to classify ourselves, so the rollup state is all we have.
     const state = rollup?.state ?? null;
-    return {pass: 0, fail: FAIL_STATES.has(state) ? 1 : 0, pending: state === 'PENDING' ? 1 : 0, failing: []};
+    return {
+      pass: 0,
+      fail: FAIL_STATES.has(state) ? 1 : 0,
+      pending: state === "PENDING" ? 1 : 0,
+      awaiting: 0,
+      failing: [],
+      awaitingOn: [],
+    };
   }
 
   const failing = contexts.filter((c) => FAIL_STATES.has(checkState(c)));
   const pass = contexts.filter((c) => GREEN_STATES.has(checkState(c))).length;
+  // Neither green nor failing: in flight, or parked on a human. Splitting the
+  // two is the whole point — pending has to mean "a machine is still working",
+  // otherwise the busy backstop below chases a state that will never move.
+  const unsettled = contexts.filter(
+    (c) => !FAIL_STATES.has(checkState(c)) && !GREEN_STATES.has(checkState(c)),
+  );
+  const awaiting = unsettled.filter(needsAPerson);
   return {
     pass,
     fail: failing.length,
-    pending: contexts.length - pass - failing.length,
-    failing: [...new Set(failing.map((c) => c.name ?? c.context ?? '?'))].sort((a, b) => a.localeCompare(b)),
+    pending: unsettled.length - awaiting.length,
+    awaiting: awaiting.length,
+    failing: contextNames(failing),
+    awaitingOn: contextNames(awaiting),
   };
 }
 
@@ -205,29 +274,35 @@ function summariseChecks(node) {
 // a DRAFT glyph would hide red CI on most of the bar. It changes how READY
 // renders instead, and nothing else.
 function deriveStatus(pr) {
-  if (pr.state === 'MERGED') return 'MERGED';
-  if (pr.state === 'CLOSED') return 'CLOSED';
-  if (pr.isInMergeQueue) return 'QUEUED';
-  if (pr.checks.fail > 0) return 'FAILING';
-  if (pr.mergeable === 'CONFLICTING' || pr.mergeStateStatus === 'DIRTY') return 'CONFLICT';
-  if (pr.reviewDecision === 'CHANGES_REQUESTED') return 'CHANGES';
-  if (pr.checks.pending > 0) return 'PENDING';
+  if (pr.state === "MERGED") return "MERGED";
+  if (pr.state === "CLOSED") return "CLOSED";
+  if (pr.isInMergeQueue) return "QUEUED";
+  if (pr.checks.fail > 0) return "FAILING";
+  if (pr.mergeable === "CONFLICTING" || pr.mergeStateStatus === "DIRTY")
+    return "CONFLICT";
+  if (pr.reviewDecision === "CHANGES_REQUESTED") return "CHANGES_REQUESTED";
+  // Ahead of BUILDING deliberately. A build clears itself and this does not, so
+  // the thing worth showing while both are outstanding is the one wanting me.
+  if (pr.checks.awaiting > 0) return "WAITING_ME";
+  if (pr.checks.pending > 0) return "BUILDING";
 
   switch (pr.mergeStateStatus) {
-    case 'CLEAN':
-    case 'BEHIND':
-    case 'HAS_HOOKS':
-    case 'DRAFT':
+    case "CLEAN":
+    case "BEHIND":
+    case "HAS_HOOKS":
+    case "DRAFT":
     // Nothing is failing or pending by this point, so UNSTABLE can only mean
     // cancelled or neutral runs, which we already count as green.
-    case 'UNSTABLE':
-      return 'READY';
-    case 'BLOCKED':
-      if (pr.isDraft) return 'READY'; // blocked by its own draftness, not by us
-      return pr.reviewDecision === 'REVIEW_REQUIRED' ? 'REVIEW' : 'BLOCKED';
+    case "UNSTABLE":
+      return "READY";
+    case "BLOCKED":
+      if (pr.isDraft) return "READY"; // blocked by its own draftness, not by us
+      return pr.reviewDecision === "REVIEW_REQUIRED"
+        ? "WAITING_REVIEW"
+        : "WAITING_ME";
     default:
       // GitHub computes mergeability lazily and answers UNKNOWN while it works.
-      return 'UNKNOWN';
+      return "UNKNOWN";
   }
 }
 
@@ -243,9 +318,9 @@ function normalisePr(node) {
     head: node.headRefName,
     base: node.baseRefName,
     isDraft: node.isDraft,
-    mergeable: node.mergeable ?? 'UNKNOWN',
-    mergeStateStatus: node.mergeStateStatus ?? 'UNKNOWN',
-    reviewDecision: node.reviewDecision ?? 'NONE',
+    mergeable: node.mergeable ?? "UNKNOWN",
+    mergeStateStatus: node.mergeStateStatus ?? "UNKNOWN",
+    reviewDecision: node.reviewDecision ?? "NONE",
     isInMergeQueue: node.isInMergeQueue,
     queuePosition: node.mergeQueueEntry?.position ?? null,
     unresolved: threads.filter((t) => !t.isResolved).length,
@@ -262,7 +337,8 @@ function buildStacks(prs) {
   // A branch can carry an old closed pull request as well as a live one, so an
   // open pull request always wins the branch, then the newest number.
   const ranked = [...prs].sort((a, b) => {
-    if ((a.state === 'OPEN') !== (b.state === 'OPEN')) return a.state === 'OPEN' ? -1 : 1;
+    if ((a.state === "OPEN") !== (b.state === "OPEN"))
+      return a.state === "OPEN" ? -1 : 1;
     return b.number - a.number;
   });
   const byHead = new Map();
@@ -272,7 +348,10 @@ function buildStacks(prs) {
   }
   const parent = new Map(prs.map((pr) => [pr.number, pr.number]));
 
-  const find = (n) => (parent.get(n) === n ? n : (parent.set(n, find(parent.get(n))), parent.get(n)));
+  const find = (n) =>
+    parent.get(n) === n
+      ? n
+      : (parent.set(n, find(parent.get(n))), parent.get(n));
   const union = (a, b) => parent.set(find(a), find(b));
 
   for (const pr of prs) {
@@ -294,7 +373,7 @@ function buildStacks(prs) {
   const bottomOf = (pr) => {
     const seen = new Set([pr.number]);
     let current = pr;
-    for (; ;) {
+    for (;;) {
       const base = byHead.get(`${current.repo}#${current.base}`);
       if (!base || seen.has(base.number)) return current;
       seen.add(base.number);
@@ -302,7 +381,11 @@ function buildStacks(prs) {
     }
   };
 
-  return {byHead, bottomOf, stackOf: (pr) => stacks.get(find(pr.number)) ?? [pr.number]};
+  return {
+    byHead,
+    bottomOf,
+    stackOf: (pr) => stacks.get(find(pr.number)) ?? [pr.number],
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -313,7 +396,10 @@ class NoTmuxServer extends Error {}
 
 async function tmux(args) {
   const out = await $`tmux ${args}`.nothrow();
-  if (out.exitCode !== 0 && /no server running|no such file or directory/i.test(out.stderr)) {
+  if (
+    out.exitCode !== 0 &&
+    /no server running|no such file or directory/i.test(out.stderr)
+  ) {
     throw new NoTmuxServer();
   }
   return out;
@@ -324,13 +410,14 @@ const gitCache = new Map();
 async function gitInfo(dir) {
   if (!dir) return null;
   if (gitCache.has(dir)) return gitCache.get(dir);
-  const out = await $`git -C ${dir} rev-parse --show-toplevel --abbrev-ref HEAD --git-common-dir`.nothrow();
+  const out =
+    await $`git -C ${dir} rev-parse --show-toplevel --abbrev-ref HEAD --git-common-dir`.nothrow();
   let info = null;
   if (out.exitCode === 0) {
-    const [root, branch, commonDir] = out.stdout.trim().split('\n');
+    const [root, branch, commonDir] = out.stdout.trim().split("\n");
     info = {
       root,
-      branch: branch === 'HEAD' ? null : branch, // detached, which happens mid-restack
+      branch: branch === "HEAD" ? null : branch, // detached, which happens mid-restack
       commonDir: path.resolve(root, commonDir),
     };
   }
@@ -344,8 +431,12 @@ const repoCache = new Map();
 // repo shares its common dir, and therefore its remote.
 async function repoName(commonDir) {
   if (repoCache.has(commonDir)) return repoCache.get(commonDir);
-  const out = await $`git --git-dir=${commonDir} config --get remote.origin.url`.nothrow();
-  const match = out.exitCode === 0 ? out.stdout.trim().match(/[:/]([^/:]+\/[^/]+?)(?:\.git)?$/) : null;
+  const out =
+    await $`git --git-dir=${commonDir} config --get remote.origin.url`.nothrow();
+  const match =
+    out.exitCode === 0
+      ? out.stdout.trim().match(/[:/]([^/:]+\/[^/]+?)(?:\.git)?$/)
+      : null;
   const name = match?.[1] ?? null;
   repoCache.set(commonDir, name);
   return name;
@@ -357,16 +448,21 @@ async function resolveWindows() {
   // Space-separated and parsed from the left: a tab in the format string does
   // not survive shell quoting the same way on every zx build, and a path may
   // legitimately contain spaces.
-  const out = await tmux(['list-panes', '-a', '-F', '#{window_id} #{pane_active} #{pane_current_path}']);
+  const out = await tmux([
+    "list-panes",
+    "-a",
+    "-F",
+    "#{window_id} #{pane_active} #{pane_current_path}",
+  ]);
   if (out.exitCode !== 0) return new Map();
 
   const panes = new Map();
-  for (const line of out.stdout.trim().split('\n').filter(Boolean)) {
-    const [windowId, active, ...rest] = line.split(' ');
-    const panePath = rest.join(' ');
+  for (const line of out.stdout.trim().split("\n").filter(Boolean)) {
+    const [windowId, active, ...rest] = line.split(" ");
+    const panePath = rest.join(" ");
     if (!windowId || !panePath) continue;
     if (!panes.has(windowId)) panes.set(windowId, []);
-    panes.get(windowId)[active === '1' ? 'unshift' : 'push'](panePath);
+    panes.get(windowId)[active === "1" ? "unshift" : "push"](panePath);
   }
 
   const windows = new Map();
@@ -374,7 +470,11 @@ async function resolveWindows() {
     for (const panePath of paths) {
       const info = await gitInfo(panePath);
       if (!info?.branch) continue;
-      windows.set(windowId, {path: info.root, branch: info.branch, repo: await repoName(info.commonDir)});
+      windows.set(windowId, {
+        path: info.root,
+        branch: info.branch,
+        repo: await repoName(info.commonDir),
+      });
       break;
     }
   }
@@ -382,7 +482,7 @@ async function resolveWindows() {
 }
 
 async function clientAttached() {
-  const out = await tmux(['list-clients', '-F', '#{client_name}']);
+  const out = await tmux(["list-clients", "-F", "#{client_name}"]);
   return out.exitCode === 0 && out.stdout.trim().length > 0;
 }
 
@@ -391,7 +491,7 @@ async function clientAttached() {
 // ---------------------------------------------------------------------------
 
 function labelFor(pr) {
-  if (pr.status === 'READY' && pr.isDraft) return LABELS.DRAFT_READY;
+  if (pr.status === "READY" && pr.isDraft) return LABELS.DRAFT;
   return LABELS[pr.status] ?? LABELS.UNKNOWN;
 }
 
@@ -399,7 +499,7 @@ function labelFor(pr) {
 // included, so the whole indicator has one subject.
 function render(bottom) {
   const [letter, colour] = labelFor(bottom);
-  let out = ` #[fg=${colour}]${letter}`;
+  let out = `#[fg=${colour}]${letter}`;
   if (bottom.unresolved > 0) out += `#[fg=red]${bottom.unresolved}`;
   return out;
 }
@@ -407,68 +507,80 @@ function render(bottom) {
 async function push(rendered, windowIds) {
   const args = [];
   const add = (...parts) => {
-    if (args.length) args.push(';');
+    if (args.length) args.push(";");
     args.push(...parts);
   };
 
   for (const windowId of windowIds) {
     const entry = rendered.get(windowId);
     if (entry) {
-      add('set', '-w', '-t', windowId, LETTER_OPTION, entry.letter);
-      add('set', '-w', '-t', windowId, NUMBER_OPTION, String(entry.number));
+      add("set", "-w", "-t", windowId, LETTER_OPTION, entry.letter);
+      add("set", "-w", "-t", windowId, NUMBER_OPTION, String(entry.number));
     } else {
-      add('set', '-uw', '-t', windowId, LETTER_OPTION);
-      add('set', '-uw', '-t', windowId, NUMBER_OPTION);
+      add("set", "-uw", "-t", windowId, LETTER_OPTION);
+      add("set", "-uw", "-t", windowId, NUMBER_OPTION);
     }
   }
 
   if (args.length === 0) return;
   await tmux(args);
-  await tmux(['refresh-client', '-S']);
+  await tmux(["refresh-client", "-S"]);
 }
 
 // ---------------------------------------------------------------------------
 // one poll cycle
 // ---------------------------------------------------------------------------
 
-async function cycle(state, {force = false} = {}) {
+async function cycle(state, { force = false } = {}) {
   gitCache.clear();
 
   const windows = await resolveWindows();
-  const windowKey = [...windows.entries()].map(([id, w]) => `${id}:${w.repo}#${w.branch}`).sort().join('|');
+  const windowKey = [...windows.entries()]
+    .map(([id, w]) => `${id}:${w.repo}#${w.branch}`)
+    .sort()
+    .join("|");
   const windowsChanged = windowKey !== state.windowKey;
 
-  const sinceFetch = state.updatedAt ? (Date.now() - Date.parse(state.updatedAt)) / 1000 : Infinity;
-  state.busy = Object.values(state.prs).some((pr) => pr.checks.pending > 0 || pr.isInMergeQueue);
-  const backstopDue = sinceFetch >= (state.busy ? BACKSTOP_BUSY_SECS : BACKSTOP_IDLE_SECS);
+  const sinceFetch = state.updatedAt
+    ? (Date.now() - Date.parse(state.updatedAt)) / 1000
+    : Infinity;
+  state.busy = Object.values(state.prs).some(
+    (pr) => pr.checks.pending > 0 || pr.isInMergeQueue,
+  );
+  const backstopDue =
+    sinceFetch >= (state.busy ? BACKSTOP_BUSY_SECS : BACKSTOP_IDLE_SECS);
 
   let refetch = force || windowsChanged || backstopDue;
   if (!refetch) refetch = await heartbeatMoved(state);
 
   if (refetch) {
     if (state.rateLimit && state.rateLimit.remaining < RATE_LIMIT_FLOOR) {
-      throw new Error(`rate limit floor reached (${state.rateLimit.remaining} left)`);
+      throw new Error(
+        `rate limit floor reached (${state.rateLimit.remaining} left)`,
+      );
     }
     const data = await fetchPrs(state.author ?? (state.author = await login()));
-    const prs = [...data.open.nodes, ...data.closed.nodes].filter((n) => n?.number).map(normalisePr);
+    const prs = [...data.open.nodes, ...data.closed.nodes]
+      .filter((n) => n?.number)
+      .map(normalisePr);
     state.rateLimit = data.rateLimit;
     state.prs = Object.fromEntries(prs.map((pr) => [pr.number, pr]));
     state.updatedAt = new Date().toISOString();
   }
 
   const prs = Object.values(state.prs);
-  const {byHead, bottomOf, stackOf} = buildStacks(prs);
+  const { byHead, bottomOf, stackOf } = buildStacks(prs);
 
   const rendered = new Map();
   state.windows = {};
   for (const [windowId, window] of windows) {
     const pr = byHead.get(`${window.repo}#${window.branch}`);
     if (!pr) {
-      state.windows[windowId] = {...window, pr: null};
+      state.windows[windowId] = { ...window, pr: null };
       continue;
     }
     const bottom = bottomOf(pr);
-    rendered.set(windowId, {letter: render(bottom), number: bottom.number});
+    rendered.set(windowId, { letter: render(bottom), number: bottom.number });
     state.windows[windowId] = {
       ...window,
       pr: pr.number,
@@ -482,7 +594,7 @@ async function cycle(state, {force = false} = {}) {
   writeState(state);
   await push(rendered, [...windows.keys()]);
 
-  return {refetched: refetch, windows: windows.size, prs: prs.length};
+  return { refetched: refetch, windows: windows.size, prs: prs.length };
 }
 
 // ---------------------------------------------------------------------------
@@ -492,13 +604,15 @@ async function cycle(state, {force = false} = {}) {
 // The wrapper rather than this file: it execs zx with the .mjs path, which
 // keeps the pid and avoids zx's leftover compiled copy.
 function selfPath() {
-  const installed = path.join(HOME, '.local', 'bin', 'prstatusd');
-  return fs.pathExistsSync(installed) ? installed : fileURLToPath(import.meta.url);
+  const installed = path.join(HOME, ".local", "bin", "prstatusd");
+  return fs.pathExistsSync(installed)
+    ? installed
+    : fileURLToPath(import.meta.url);
 }
 
 function runningPid() {
   try {
-    const pid = Number(fs.readFileSync(PID_FILE, 'utf8').trim());
+    const pid = Number(fs.readFileSync(PID_FILE, "utf8").trim());
     if (!pid) return null;
     process.kill(pid, 0); // liveness probe, not a signal
     return pid;
@@ -515,7 +629,7 @@ function log(message) {
 async function clearAllLetters() {
   const out = await $`tmux list-windows -a -F '#{window_id}'`.nothrow();
   if (out.exitCode !== 0) return;
-  const ids = out.stdout.trim().split('\n').filter(Boolean);
+  const ids = out.stdout.trim().split("\n").filter(Boolean);
   await push(new Map(), ids).catch(() => {});
 }
 
@@ -524,8 +638,11 @@ async function start() {
   if (pid) return console.log(`already running (pid ${pid})`);
 
   fs.ensureDirSync(STATE_DIR);
-  const out = fs.openSync(LOG_FILE, 'a');
-  const child = spawn(selfPath(), ['run'], {detached: true, stdio: ['ignore', out, out]});
+  const out = fs.openSync(LOG_FILE, "a");
+  const child = spawn(selfPath(), ["run"], {
+    detached: true,
+    stdio: ["ignore", out, out],
+  });
   child.unref();
   fs.writeFileSync(PID_FILE, String(child.pid));
   console.log(`started (pid ${child.pid})`);
@@ -536,9 +653,9 @@ async function stop() {
   if (!pid) {
     fs.removeSync(PID_FILE);
     await clearAllLetters();
-    return console.log('not running');
+    return console.log("not running");
   }
-  process.kill(pid, 'SIGTERM');
+  process.kill(pid, "SIGTERM");
   fs.removeSync(PID_FILE);
   await clearAllLetters();
   console.log(`stopped (pid ${pid})`);
@@ -552,23 +669,24 @@ async function run() {
     if (runningPid() === process.pid) fs.removeSync(PID_FILE);
     process.exit(0);
   };
-  process.on('SIGTERM', bye);
-  process.on('SIGINT', bye);
+  process.on("SIGTERM", bye);
+  process.on("SIGINT", bye);
 
   const state = readState();
   log(`daemon up (pid ${process.pid})`);
 
   let failures = 0;
-  for (; ;) {
+  for (;;) {
     try {
       if (await clientAttached()) {
         const result = await cycle(state);
-        if (result.refetched) log(`refetched: ${result.prs} prs, ${result.windows} windows`);
+        if (result.refetched)
+          log(`refetched: ${result.prs} prs, ${result.windows} windows`);
       }
       failures = 0;
     } catch (error) {
       if (error instanceof NoTmuxServer) {
-        log('tmux server gone — exiting');
+        log("tmux server gone — exiting");
         fs.removeSync(PID_FILE);
         process.exit(0);
       }
@@ -591,82 +709,121 @@ async function resolveTarget(arg) {
   const state = readState();
   const prs = Object.values(state.prs);
 
-  if (/^\d+$/.test(arg ?? '')) return Number(arg);
+  if (/^\d+$/.test(arg ?? "")) return Number(arg);
 
   if (arg) {
     const byBranch = prs.find((pr) => pr.head === arg);
     if (byBranch) return byBranch.number;
-    const byWindow = Object.values(state.windows).find((w) => w.path?.endsWith(`/${arg}`));
+    const byWindow = Object.values(state.windows).find((w) =>
+      w.path?.endsWith(`/${arg}`),
+    );
     if (byWindow?.pr) return byWindow.pr;
     throw new Error(`no open PR matches "${arg}"`);
   }
 
   const info = await gitInfo(process.cwd());
-  if (!info?.branch) throw new Error('not on a branch');
+  if (!info?.branch) throw new Error("not on a branch");
   const repo = await repoName(info.commonDir);
   const pr = prs.find((p) => p.repo === repo && p.head === info.branch);
   if (!pr) throw new Error(`no open PR for ${info.branch}`);
   return pr.number;
 }
 
+const CHALK = {
+  green: chalk.green,
+  yellow: chalk.yellow,
+  blue: chalk.blue,
+  red: chalk.red,
+  magenta: chalk.magenta,
+  colour242: chalk.dim,
+};
+
+// Read out of LABELS rather than repeated here, so the pane view cannot end up
+// disagreeing with the tab about whose move it is. QUEUED arrives with its
+// position appended, and pr.state arrives as MERGED or CLOSED, both of which
+// are labels in their own right.
 function colourStatus(status) {
-  if (status === 'READY') return chalk.green(status);
-  if (status === 'MERGED') return chalk.magenta(status);
-  if (status === 'CLOSED' || status === 'UNKNOWN') return chalk.dim(status);
-  if (status.startsWith('QUEUED')) return chalk.yellow(status);
-  return chalk.red(status);
+  const [, colour] = LABELS[status.split("#")[0]] ?? LABELS.UNKNOWN;
+  return (CHALK[colour] ?? chalk.dim)(status);
 }
 
 function watchLine(pr, stack) {
-  const {checks} = pr;
+  const { checks } = pr;
   let checksOut;
   if (checks.fail > 0) checksOut = chalk.red(`⨯${checks.fail}`);
-  else if (checks.pending > 0) checksOut = `${chalk.yellow(String(checks.pending).padStart(2, ' '))}:${chalk.green(checks.pass)}`;
+  else if (checks.pending > 0)
+    checksOut = `${chalk.yellow(String(checks.pending).padStart(2, " "))}:${chalk.green(checks.pass)}`;
   else checksOut = chalk.green(checks.pass);
 
-  const threads = chalk[pr.unresolved > 0 ? 'red' : 'green'](`•${pr.unresolved}`);
-  const status = pr.isInMergeQueue && pr.queuePosition != null
-    ? colourStatus(`QUEUED#${pr.queuePosition}`)
-    : colourStatus(pr.status);
+  const threads = chalk[pr.unresolved > 0 ? "red" : "green"](
+    `•${pr.unresolved}`,
+  );
+  const status =
+    pr.isInMergeQueue && pr.queuePosition != null
+      ? colourStatus(`QUEUED#${pr.queuePosition}`)
+      : colourStatus(pr.status);
 
-  const parts = [chalk.dim(new Date().toLocaleTimeString()), checksOut, threads, status];
-  if (stack.length > 1) parts.push(chalk.dim(`stack ${stack.map((n) => (n === pr.number ? `[${n}]` : n)).join(' ')}`));
-  if (checks.failing.length) parts.push(chalk.red(checks.failing.join(', ')));
-  return parts.join(' ');
+  const parts = [
+    chalk.dim(new Date().toLocaleTimeString()),
+    checksOut,
+    threads,
+    status,
+  ];
+  if (stack.length > 1)
+    parts.push(
+      chalk.dim(
+        `stack ${stack.map((n) => (n === pr.number ? `[${n}]` : n)).join(" ")}`,
+      ),
+    );
+  if (checks.failing.length) parts.push(chalk.red(checks.failing.join(", ")));
+  if (checks.awaitingOn?.length)
+    parts.push(chalk.red(`needs you: ${checks.awaitingOn.join(", ")}`));
+  return parts.join(" ");
 }
 
 async function watch(arg) {
   const number = await resolveTarget(arg);
   let state = readState();
   let pr = state.prs[number];
-  if (!pr) throw new Error(`PR #${number} is not in the daemon's state — is prstatusd running?`);
+  if (!pr)
+    throw new Error(
+      `PR #${number} is not in the daemon's state — is prstatusd running?`,
+    );
 
   console.log(chalk.bold(pr.title));
-  console.log(chalk.dim(`${pr.head} → ${pr.base}${pr.isDraft ? '  (draft)' : ''}`));
+  console.log(
+    chalk.dim(`${pr.head} → ${pr.base}${pr.isDraft ? "  (draft)" : ""}`),
+  );
   console.log(chalk.dim(pr.url));
-  console.log(chalk.dim(`https://app.graphite.com/github/pr/${pr.repo}/${pr.number}`));
+  console.log(
+    chalk.dim(`https://app.graphite.com/github/pr/${pr.repo}/${pr.number}`),
+  );
 
-  let previousStatus = '';
+  let previousStatus = "";
   let previousMtime = 0;
 
-  for (; ;) {
+  for (;;) {
     const mtime = fs.statSync(STATE_FILE).mtimeMs;
     if (mtime !== previousMtime) {
       previousMtime = mtime;
       state = readState();
       pr = state.prs[number];
       if (!pr) {
-        console.log(`${chalk.dim(new Date().toLocaleTimeString())} ${chalk.yellow('dropped out of the daemon\'s state — exiting')}`);
-        process.stdout.write('\x07');
+        console.log(
+          `${chalk.dim(new Date().toLocaleTimeString())} ${chalk.yellow("dropped out of the daemon's state — exiting")}`,
+        );
+        process.stdout.write("\x07");
         process.exit(0);
       }
-      const stack = Object.values(state.windows).find((w) => w.pr === number)?.stack ?? [number];
+      const stack = Object.values(state.windows).find((w) => w.pr === number)
+        ?.stack ?? [number];
       console.log(watchLine(pr, stack));
-      if (previousStatus && previousStatus !== pr.status) process.stdout.write('\x07');
+      if (previousStatus && previousStatus !== pr.status)
+        process.stdout.write("\x07");
       previousStatus = pr.status;
-      if (pr.state !== 'OPEN') {
+      if (pr.state !== "OPEN") {
         console.log(`\nPR is ${colourStatus(pr.state)} — exiting.`);
-        process.stdout.write('\x07');
+        process.stdout.write("\x07");
         process.exit(0);
       }
     }
@@ -681,24 +838,33 @@ async function watch(arg) {
 async function status() {
   const pid = runningPid();
   const state = readState();
-  console.log(`daemon:     ${pid ? chalk.green(`running (pid ${pid})`) : chalk.red('stopped')}`);
-  console.log(`last fetch: ${state.updatedAt ? `${Math.round((Date.now() - Date.parse(state.updatedAt)) / 1000)}s ago` : 'never'}`);
-  console.log(`rate limit: ${state.rateLimit ? `${state.rateLimit.remaining} left` : 'unknown'}`);
+  console.log(
+    `daemon:     ${pid ? chalk.green(`running (pid ${pid})`) : chalk.red("stopped")}`,
+  );
+  console.log(
+    `last fetch: ${state.updatedAt ? `${Math.round((Date.now() - Date.parse(state.updatedAt)) / 1000)}s ago` : "never"}`,
+  );
+  console.log(
+    `rate limit: ${state.rateLimit ? `${state.rateLimit.remaining} left` : "unknown"}`,
+  );
   const prs = Object.values(state.prs);
-  const open = prs.filter((pr) => pr.state === 'OPEN').length;
+  const open = prs.filter((pr) => pr.state === "OPEN").length;
   console.log(`prs:        ${open} open, ${prs.length - open} recently closed`);
   for (const [windowId, window] of Object.entries(state.windows)) {
     if (!window.pr) {
-      console.log(`  ${windowId} ${window.branch} → ${chalk.dim('no pr')}`);
+      console.log(`  ${windowId} ${window.branch} → ${chalk.dim("no pr")}`);
       continue;
     }
-    const parts = [`#${window.pr} ${state.prs[window.pr]?.status ?? '?'}`];
+    const parts = [`#${window.pr} ${state.prs[window.pr]?.status ?? "?"}`];
     if (window.stack?.length > 1) parts.push(`stack of ${window.stack.length}`);
     if (window.bottom !== window.pr) {
-      parts.push(`letter from bottom #${window.bottom} ${state.prs[window.bottom]?.status ?? '?'}`);
+      parts.push(
+        `letter from bottom #${window.bottom} ${state.prs[window.bottom]?.status ?? "?"}`,
+      );
     }
-    if (window.unresolved) parts.push(`${window.unresolved} unresolved on the bottom`);
-    console.log(`  ${windowId} ${window.branch} → ${parts.join(', ')}`);
+    if (window.unresolved)
+      parts.push(`${window.unresolved} unresolved on the bottom`);
+    console.log(`  ${windowId} ${window.branch} → ${parts.join(", ")}`);
   }
 }
 
@@ -711,58 +877,61 @@ async function openPr(target) {
   const url = `https://app.graphite.com/github/pr/${pr.repo}/${pr.number}`;
   const out = await $`open ${url}`.nothrow();
   // A click discards its output, so the log is the only trace it left.
-  if (out.exitCode !== 0) log(`open #${pr.number} failed: ${out.stderr.trim()}`);
+  if (out.exitCode !== 0)
+    log(`open #${pr.number} failed: ${out.stderr.trim()}`);
 }
 
 const HELP = [
-  'prstatusd — one poller for every worktree\'s PR state.',
-  '',
-  'Usage:',
-  '  prstatusd start          # start the background daemon (idempotent)',
-  '  prstatusd stop           # stop it and clear the letters',
-  '  prstatusd restart',
-  '  prstatusd toggle         # bound to prefix P',
-  '  prstatusd status         # daemon health, last fetch, resolved windows',
-  '  prstatusd once           # one poll cycle now, then exit (prefix R)',
-  '  prstatusd run            # run the loop in the foreground',
-  '  prstatusd watch [target] # the pane view; target is a PR number, branch, or worktree',
-  '  prstatusd open <number>  # open a PR in graphite; bound to a click on its letter',
-].join('\n');
+  "prstatusd — one poller for every worktree's PR state.",
+  "",
+  "Usage:",
+  "  prstatusd start          # start the background daemon (idempotent)",
+  "  prstatusd stop           # stop it and clear the letters",
+  "  prstatusd restart",
+  "  prstatusd toggle         # bound to prefix P",
+  "  prstatusd status         # daemon health, last fetch, resolved windows",
+  "  prstatusd once           # one poll cycle now, then exit (prefix R)",
+  "  prstatusd run            # run the loop in the foreground",
+  "  prstatusd watch [target] # the pane view; target is a PR number, branch, or worktree",
+  "  prstatusd open <number>  # open a PR in graphite; bound to a click on its letter",
+].join("\n");
 
-const command = argv._[0] ?? 'help';
+const command = argv._[0] ?? "help";
 
 try {
   switch (command) {
-    case 'start':
+    case "start":
       await start();
       break;
-    case 'stop':
+    case "stop":
       await stop();
       break;
-    case 'restart':
+    case "restart":
       await stop();
       await start();
       break;
-    case 'toggle':
+    case "toggle":
       if (runningPid()) await stop();
       else await start();
       break;
-    case 'status':
+    case "status":
       await status();
       break;
-    case 'once': {
+    case "once": {
       const state = readState();
-      const result = await cycle(state, {force: argv.force ?? false});
-      console.log(`${result.prs} prs, ${result.windows} windows${result.refetched ? ' (refetched)' : ''}`);
+      const result = await cycle(state, { force: argv.force ?? false });
+      console.log(
+        `${result.prs} prs, ${result.windows} windows${result.refetched ? " (refetched)" : ""}`,
+      );
       break;
     }
-    case 'run':
+    case "run":
       await run();
       break;
-    case 'watch':
+    case "watch":
       await watch(argv._[1]);
       break;
-    case 'open':
+    case "open":
       await openPr(argv._[1]);
       break;
     default:
@@ -770,7 +939,7 @@ try {
   }
 } catch (error) {
   if (error instanceof NoTmuxServer) {
-    console.error('no tmux server running');
+    console.error("no tmux server running");
     process.exit(1);
   }
   console.error(chalk.red(error.message));
