@@ -291,6 +291,14 @@ alias wmc='workmux close'
 alias wml='workmux list'
 alias {wmt,wmn}='workmux add -A -e'
 
+wo() {
+    local h
+    h=$(workmux ls --json | jq -r '.[]|select((.is_main or .is_open)|not)|.handle+"\t"+.branch' \
+      | column -t -s$'\t' \
+      | fzf --reverse --height=40% --header='open worktree') || return
+    [ -n "$h" ] && workmux open "${h%% *}"
+  }
+
 function review() {
   workmux add -p "/code-review ${@:2}" --pr $1
 }

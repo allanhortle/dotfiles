@@ -1,0 +1,5 @@
+#!/bin/sh
+# zx compiles a script whose name lacks a .mjs extension to a sibling copy and
+# only unlinks it on a clean exit, so anything killed by a signal leaves the
+# copy behind. Invoking the .mjs directly skips that step entirely.
+exec zx "$(dirname "$(readlink -f "$0")")/prstatusd.mjs" "$@"

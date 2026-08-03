@@ -13,6 +13,7 @@ brew "tmux"
 brew "vim"
 brew "visidata"
 brew "zoxide"
+brew "zx"
 
 cask "1password"
 cask "alacritty"

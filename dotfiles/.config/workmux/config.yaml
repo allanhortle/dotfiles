@@ -1,5 +1,7 @@
 agent: claude
 window_prefix: ''
+pre_remove:
+    - yarn stack down || true
 files:
   copy:
     - packages/*/.env
@@ -8,33 +10,6 @@ files:
     - packages/i18n/dist/
     - packages/main/firebase.json
     - firebase-config.json
-sandbox:
-  enabled: false
-  host_commands: ["yarn"]
-  env_passthrough:
-    - GITHUB_TOKEN
-    - OPENAI_API_KEY
-  container: 
-    runtime: apple-container
-  extra_mounts:
-    - ~/.pi/agent/skills
-    - ~/.claude
-    #- host_path: /tmp
-      #guest_path: /tmp
-      #writeable: true
-
-
-# Lima Config
-    #- ANTHROPIC_API_KEY
-  #extra_mounts:
-    #- ~/.pi/agent/skills
-  #backend: lima
-  #lima:
-    #provision: |
-      #sudo apt-get install -y ripgrep jq unzip gh
-      #curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-      #sudo apt-get install -y nodejs
-      #sudo npm install -g @mariozechner/pi-coding-agent
 
 panes:
   - command: clear
@@ -46,11 +21,11 @@ panes:
 nerdfont: false
 status_format: false
 status_icons:
-  working: "W"
-  waiting: "..."
-  done: "✔"
+  working: "~"
+  waiting: "?"
+  done: ""
 auto_name:
-  model: gemini-2.5-flash-lite
+  model: haiku
   system_prompt: |
     You output a single git branch name. Nothing else.
 
