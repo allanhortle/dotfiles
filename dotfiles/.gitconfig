@@ -14,7 +14,7 @@
 	tool = vimdiff
 [merge "json"]
     name = custom merge driver for json files
-    driver = git-json-merge %A %O %B
+    driver = git-json-merge-fix %A %O %B
 [difftool]
 	prompt = false
 [diff]

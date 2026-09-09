@@ -300,7 +300,7 @@ wo() {
   }
 
 function review() {
-  workmux add -p "/code-review ${@:2}" --pr $1
+  workmux add --agent review -p "/code-review ${@:2}" --pr $1
 }
 
 function branch_delete() {

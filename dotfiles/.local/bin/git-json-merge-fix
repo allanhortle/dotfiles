@@ -1,0 +1,24 @@
+#!/bin/sh
+# git-json-merge writes its result with JSON.stringify(obj, null, detectIndent(file)),
+# which discards the file's own layout. Tactiq's lang locale files carry no
+# indentation at all, so detect-indent reports '' and the whole file collapses onto
+# one line; any other JSON silently loses its trailing newline. Merge first, then
+# restore the layout the "ours" side had.
+set -u
+
+ours=$1
+base=$2
+theirs=$3
+
+snapshot=$(mktemp "${TMPDIR:-/tmp}/git-json-merge.XXXXXX")
+cp "$ours" "$snapshot"
+
+git-json-merge "$ours" "$base" "$theirs"
+status=$?
+
+if [ "$status" -eq 0 ]; then
+	node "$(dirname "$(readlink -f "$0")")/git-json-merge-fix.mjs" "$ours" "$snapshot" || status=$?
+fi
+
+rm -f "$snapshot"
+exit "$status"
