@@ -1,0 +1,278 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# MIT License
+#
+# Copyright (c) 2026 Junegunn Choi
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+require 'rbconfig'
+require 'tempfile'
+require 'tmpdir'
+require 'fileutils'
+require 'json'
+require 'shellwords'
+
+gems = %w[sqlite3 ansi256]
+begin
+  gems.each { require it }
+rescue LoadError
+  require 'bundler/inline'
+  gemfile(true) do
+    source 'https://rubygems.org'
+    gems.each { gem it }
+  end
+end
+
+# Chrome fzf integration: open tabs, bookmarks and history in a single finder,
+# ranked by match quality with a nudge in favour of tabs, then bookmarks.
+module ChromeFzf
+  extend self
+
+  # Platform-specific constants.
+  # FIXME: Commands for Linux and Windows are not tested.
+  BASE_PATH, OPEN_COMMAND, CLIP_COMMAND, FOCUS_COMMAND =
+    case RbConfig::CONFIG['host_os']
+    when /darwin/
+      ['Library/Application Support/Google/Chrome', 'open {+2}', 'echo -n {+2} | pbcopy', DATA.read]
+    when /linux/
+      ['.config/google-chrome', 'xdg-open {+2}', 'echo -n {+2} | xsel --clipboard --input', '']
+    else
+      ['AppData\Local\Google\Chrome\User Data', 'start {+2}', 'echo {+2} | clip', '']
+    end
+
+  DELIMITER = "\a"
+  RS = "\x0"
+
+  # Cache order, which is also the order fzf sees, so an earlier group wins a
+  # tie under --scheme history.
+  GROUPS = %i[tabs bookmarks history].freeze
+
+  # Longest list handed to fzf.
+  LIMIT = 500
+
+  # How many places a match may climb for being a tab or a bookmark. Kept
+  # small on purpose: it lifts a tab above an equally good history entry
+  # without burying an exact history match under a loose fuzzy match.
+  BIAS = { tabs: 40, bookmarks: 20, history: 0 }.freeze
+
+  # Badges are plain words, so they can be typed to narrow to one group, and
+  # exactly four characters wide, because `rank` reads them back off the front
+  # of each record to tell which group it came from.
+  BADGES = { tabs: 'tab ', bookmarks: 'mark', history: 'hist' }.freeze
+  BADGE_COLOURS = { tabs: :cyan, bookmarks: :magenta, history: :green }.freeze
+
+  def run
+    Dir.mktmpdir('chrome-fzf') do |dir|
+      write_helpers(dir)
+      cache(dir)
+      # Items come from the `start` binding below, not from stdin.
+      system("#{fzf(dir).chomp} < /dev/null")
+    end
+  end
+
+  # Write one file per group. Groups are built in GROUPS order and a URL is
+  # only kept by the first group that has it, so an open tab is not repeated
+  # as a bookmark or a history entry.
+  def cache(dir, refresh = GROUPS)
+    seen = {}
+    GROUPS.each_with_index do |group, index|
+      # Skipping a group also skips its URLs for the dedupe below, which is
+      # only correct because partial refreshes cover the leading groups.
+      next unless refresh.include?(group)
+
+      rows = send(group).each_with_index
+                        # The index breaks ties so tabs, which carry no
+                        # timestamp, keep Chrome's own order.
+                        .sort_by { |row, idx| [-row[2].to_i, idx] }
+                        .map(&:first)
+                        .select do |row|
+        url = row[1]
+        next false if url.nil? || url.empty? || seen.key?(url)
+
+        seen[url] = true
+      end
+
+      File.write(path(dir, index), rows.map { |row| record(group, *row) }.join)
+    end
+  end
+
+  def list(io = $stdout)
+    Dir.mktmpdir('chrome-fzf') do |dir|
+      cache(dir)
+      GROUPS.each_index { |index| io.print File.read(path(dir, index)) }
+    end
+  end
+
+  private
+
+  def path(dir, index) = File.join(dir, "#{index + 1}-#{GROUPS[index]}")
+
+  def paths(name) = Dir[File.join(Dir.home, BASE_PATH, '**', name)]
+
+  # `rank` is what fzf reloads on every keystroke: every group is matched at
+  # once so the ranking is comparable across groups, then perl moves tabs and
+  # bookmarks up by BIAS places and cuts the list to LIMIT. The leading sleep
+  # debounces typing, since fzf kills a reload that is still running when the
+  # next one starts. Matching is limited to the plain fields so the ANSI codes
+  # in the display fields cannot be matched, which is also why --ansi must
+  # stay off here.
+  def write_helpers(dir)
+    bias = BIAS.reject { |_, places| places.zero? }
+               .map { |group, places| %("#{BADGES[group]}" => #{places}) }
+               .join(', ')
+
+    File.write(File.join(dir, 'rank'), <<~SH)
+      #!/usr/bin/env bash
+      dir=$(dirname "$0")
+      query=$1
+      if [[ -z $query ]]; then
+        exec cat "$dir"/[0-9]-*
+      fi
+      sleep 0.05
+      cat "$dir"/[0-9]-* |
+        fzf --read0 --print0 --delimiter=$'\\a' --nth=1,2 \\
+            --scheme history --filter="$query" |
+        perl -0ne 'BEGIN { %bias = (#{bias}) }
+                   push @rows, [$. - ($bias{substr($_, 0, 4)} // 0), $., $_];
+                   END {
+                     for (sort { $a->[0] <=> $b->[0] || $a->[1] <=> $b->[1] } @rows) {
+                       print $_->[2];
+                       last if ++$shown >= #{LIMIT};
+                     }
+                   }'
+      true
+    SH
+
+    File.write(File.join(dir, 'refresh'), <<~SH)
+      #!/usr/bin/env bash
+      exec ruby #{__FILE__.shellescape} --cache "$(dirname "$0")" "$@"
+    SH
+
+    %w[rank refresh].each { |name| FileUtils.chmod(0o755, File.join(dir, name)) }
+  end
+
+  # Build fzf command. Matching is delegated to `rank`, so fzf's own matcher
+  # is --disabled; the cost is that matched characters are not highlighted.
+  def fzf(dir)
+    rank = "#{dir.shellescape}/rank {q}"
+    refresh = "#{dir.shellescape}/refresh"
+    <<~CMD
+      fzf --ansi --read0 --multi --disabled --info inline-right --reverse \\
+          --header-border --gap \\
+          --header 'enter open/focus · ctrl-y copy · ctrl-w close tab · ctrl-r reload' \\
+          --highlight-line --height 100% --wrap word --wrap-sign '' \\
+          --delimiter "#{DELIMITER}" \\
+          --with-shell 'bash -c' \\
+          --with-nth "{4}\n{5}" \\
+          --bind 'enter:execute-silent(
+                    if [[ {3} ]]; then
+                      chrome-cli activate -t {3}
+                      #{FOCUS_COMMAND}
+                    else
+                      #{OPEN_COMMAND}
+                    fi)+deselect-all' \\
+          --bind 'ctrl-y:execute-silent(#{CLIP_COMMAND})+bell+deselect-all' \\
+          --bind 'ctrl-w:transform:
+                  [[ {3} ]] || { echo unix-word-rubout; exit; }
+                  chrome-cli close -t {3} > /dev/null
+                  #{refresh} tabs
+                  echo "reload:#{rank}"
+          ' \\
+          --bind 'ctrl-r:reload:#{refresh}; #{rank}' \\
+          --bind 'start:reload:#{rank}' \\
+          --bind 'change:first+reload:#{rank}'
+    CMD
+  end
+
+  # Fields: plain label, plain URL, tab id, coloured label, coloured URL.
+  # fzf matches the first two and displays the last two.
+  def record(group, title, url, time = nil, id = nil)
+    time = Time.at(time).strftime('%F %T') if time.is_a?(Integer)
+    badge = BADGES[group].send(BADGE_COLOURS[group])
+    label = [badge, title.to_s.strip, time && "(#{time.yellow})"].compact.join(' ').strip
+    [Ansi256.plain(label), url, id, label, url.blue.dim].join(DELIMITER) + RS
+  end
+
+  def history
+    Tempfile.create('chrome') do |temp|
+      temp.close
+      paths('History').flat_map do |history_path|
+        FileUtils.cp(history_path, temp.path)
+        SQLite3::Database.open(temp.path) do |db|
+          rows = db.execute('select title, url, last_visit_time from urls order by last_visit_time desc')
+          rows.map do |title, url, time|
+            [title, url, to_unix(time)]
+          end
+        end
+      end
+    end
+  end
+
+  def bookmarks
+    build = lambda do |parent, json|
+      name = [parent, json[:name]].compact.join('/')
+      if json[:type] == 'folder'
+        json[:children].flat_map { |child| build[name, child] }
+      else
+        [[name, json[:url], to_unix(json.values_at(:date_last_used, :date_added).max)]]
+      end
+    end
+
+    paths('Bookmarks').flat_map do |bookmark_path|
+      JSON.load_file(bookmark_path, symbolize_names: true)
+        .fetch(:roots, {})
+        .values
+        .flat_map { |e| build[nil, e] }
+    end
+  end
+
+  def tabs
+    `chrome-cli list tablinks`.each_line.filter_map do |line|
+      # [726631302:726631487] title: GitHub, url: https://github.com/
+      /^\[(?:[0-9]+:)?([0-9]+)\] title: (.+?), url: (.+?)$/.match(line) do |m|
+        [m[2], m[3], nil, m[1]]
+      end
+    end
+  end
+
+  def to_unix(time)
+    time.to_i / 1_000_000 - 11_644_473_600
+  end
+end
+
+case ARGV[0]
+when nil then ChromeFzf.run
+when '--list' then ChromeFzf.list
+when '--cache'
+  dir = ARGV[1] or abort 'Usage: --cache DIR [GROUP...]'
+  groups = ARGV[2..].map(&:to_sym)
+  ChromeFzf.cache(dir, groups.empty? ? ChromeFzf::GROUPS : groups)
+else abort "Usage: #{__FILE__} [--list]"
+end
+
+__END__
+osascript << EOF
+tell application "System Events"
+  tell process "Chrome"
+    set frontmost to true
+  end tell
+end tell
+EOF

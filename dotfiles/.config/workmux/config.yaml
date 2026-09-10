@@ -24,6 +24,13 @@ status_icons:
   working: "~"
   waiting: "?"
   done: "•"
+
+agents:
+  review:
+    type: claude
+    command: claude
+    args:
+      - --model=claude-opus-4-8
 auto_name:
   model: haiku
   system_prompt: |
