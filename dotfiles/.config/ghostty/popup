@@ -1,0 +1,40 @@
+# Floating window for the Chrome finder, opened by ctrl-p over Chrome. A
+# second Ghostty instance loads this file and nothing else, since the launcher
+# passes --config-default-files=false.
+#
+# This deliberately does not pull in the main config: a nested config-file is
+# loaded *after* the file that names it, so the main config would win every
+# setting below, fullscreen included. The looks are therefore repeated here,
+# and only the theme, which sets nothing but colours, is included.
+config-file = themes/ayu
+
+font-family = CommitMono
+font-size = 14
+font-thicken = true
+font-thicken-strength = 200
+adjust-cell-height = 1
+adjust-font-baseline = 1
+
+# Small window: Phoenix only centres it, so this is the size you tune.
+window-width = 100
+window-height = 30
+window-padding-x = 12
+window-padding-y = 8
+window-padding-balance = true
+macos-titlebar-style = hidden
+
+# A killed instance must not come back with the windows it had, which is what
+# macOS state restoration does by default.
+window-save-state = never
+
+# Phoenix finds the window by this title, so keep the two in step.
+title = chrome-fzf
+
+# Running the finder from here rather than with the CLI's -e flag, which makes
+# Ghostty ask permission to execute it every time. The shell: prefix is what
+# expands $HOME.
+initial-command = shell:"$HOME/.local/bin/chrome-fzf-popup"
+
+# The window only exists to hold the finder.
+quit-after-last-window-closed = true
+confirm-close-surface = false

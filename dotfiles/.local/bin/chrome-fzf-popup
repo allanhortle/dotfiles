@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# Runs inside the floating Ghostty window that ctrl-p opens over Chrome.
+# Ghostty runs this instead of a login shell, so Homebrew's bin directory has
+# to go back on PATH for node and fzf.
+export PATH="/opt/homebrew/bin:$PATH"
+
+# Ghostty starts every macOS command through `login`, which greets it with
+# "Last login: …". Clearing the screen and its scrollback hides the greeting
+# within a few milliseconds of it being printed, well before the finder draws.
+# A ~/.hushlogin file would stop `login` printing it at all, but that would
+# apply to every terminal, not just this window.
+printf '\033[2J\033[3J\033[H'
+
+exec "$HOME/.local/bin/chrome.fzf" --once
