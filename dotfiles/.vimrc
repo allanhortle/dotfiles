@@ -148,6 +148,8 @@ augroup END
 
 " nerdcommenter
 let g:NERDCompactSexyComs = 1
+" Treat the space after the delimiter as part of it, so uncommenting `# foo` gives `foo`.
+let g:NERDSpaceDelims = 1
 
 " markdown
 let g:markdown_fold_style = 'nested'
