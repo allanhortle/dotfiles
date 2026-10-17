@@ -358,6 +358,11 @@ function links() {
         | xargs open 
 }
 
+function crossword() {
+  max=$(date -j -v+1m -v-1d -f "%Y-%m-%d" "$1-01" "+%d")
+  seq -f "%02g" 1 $max | xargs -I {} puz pdf ~/Dropbox/crosswords/src/daily/$1-{}.puz -o ~/Dropbox/crosswords/daily
+}
+
 
 alias scripts='cat package.json | jq -r ".scripts | to_entries | .[] | [.key, .value] | @csv" | gum table -c ,, -w 30,50 | cut -d "," -f 1 | xargs yarn run'
 
@@ -428,3 +433,4 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
 # pnpm end
+
